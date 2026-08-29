@@ -292,7 +292,7 @@ Ini adalah triase insiden multi-agen — dua investigasi paralel, yang dapat dia
 
 ---
 
-## Anda Telah Selesai 🎉
+## Anda Telah Selesai
 
 → **[Lembar Contekan](cheatsheet.md)** — setiap perintah dari keempat modul di satu tempat
 

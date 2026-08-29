@@ -136,9 +136,9 @@ After `agy` updates `public/index.html`:
 
 ---
 
-## ⚠️ Field Gotchas & Failure Modes
+## Pro Tips & Key Watchouts
 
-!!! warning "Common Workshop Gotchas"
+!!! tip "Key Things to Watch For"
     1. **Puppeteer / Chromium Dependencies:** The `@modelcontextprotocol/server-puppeteer` package downloads Chromium automatically. On headless Linux systems, ensure standard system libraries (e.g. `libnss3`, `libatk-bridge2.0-0`) are available, or configure Chrome DevTools MCP with `--headless`.
     2. **Port Conflicts:** Ensure the local test server port (`8080` or `3000`) is not already bound by another service before starting `python3 -m http.server`.
     3. **Tool Approval Prompting:** Browser interaction tools (`click`, `fill`, `navigate`) are external actions. You can use `/permissions request-review` or `/permissions auto-tool` to adjust interaction prompting.

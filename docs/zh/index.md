@@ -31,7 +31,7 @@ hide:
 
     [:octicons-arrow-right-24: 开始模块 1](sdlc-productivity.md)
 
-- :material-wrench:{ .lg .middle } **模块 2 — 遗留系统现代化 ⭐**
+- :material-wrench:{ .lg .middle } **模块 2 — 遗留系统现代化**
 
     ---
 

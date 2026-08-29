@@ -140,9 +140,9 @@ This PRD is designed to test the agent's ability to:
 5. **Verify its own work** — run `mvn clean verify` after each phase and fix any breakages
 6. **Use `/rewind`** if a phase goes wrong — especially useful after the security config rewrite
 
-## ⚠️ Field Gotchas & Failure Modes
+## Pro Tips & Key Watchouts
 
-!!! warning "Common Workshop Gotchas"
+!!! tip "Key Things to Watch For"
     1. **Toolchain Preflight:** If participants are actually building and executing tests locally, Java 21 JDK (`java -version`) and Maven 3.8+ (`mvn -version`) must be installed. If running in simulated migration mode, `agy` can still perform code edits and test generation without a local JDK.
     2. **`javax.sql.*` False Positives:** Automated find-and-replace scripts often blindly replace `javax.sql.*` with `jakarta.sql.*`. The `javax.sql.DataSource` package remains part of the core Java SE runtime and must **not** be renamed.
     3. **Spring Security 6 Lambda DSL:** Spring Security 6 requires the lambda DSL for `HttpSecurity` (e.g. `http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())`). Old method-chaining patterns will not compile.

@@ -292,7 +292,7 @@ This is multi-agent incident triage — two parallel investigations, steerable m
 
 ---
 
-## Next Steps 🎉
+## Next Steps
 
 → **[Module 5: Building ADK Agents with agents-cli](agents-cli.md)** — build, evaluate, and deploy ADK agents on Google Cloud
 

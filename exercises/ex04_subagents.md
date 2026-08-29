@@ -79,9 +79,9 @@ Note the difference from branch mode: `inherit` means the subagent works in the 
 
 ---
 
-## ⚠️ Field Gotchas & Failure Modes
+## Pro Tips & Key Watchouts
 
-!!! warning "Common Workshop Gotchas"
+!!! tip "Key Things to Watch For"
     1. **Interactive Mode Requirement:** Subagent dispatch (`invoke_subagent`) only functions in interactive TUI mode. Running a script with `agy --print` cannot spawn background subagents.
     2. **Branch vs Inherit Mode:** `branch` workspace creates an isolated git worktree copy. Modifications made in a `branch` subagent do not touch your active working directory until explicitly committed or merged.
     3. **Teleport Keybindings:** Remember to use **`Alt+J`** (Option+J on macOS) to teleport between subagents. On macOS Terminal, ensure "Use Option as Meta key" is checked in your terminal preferences if `Alt+J` sends special characters.

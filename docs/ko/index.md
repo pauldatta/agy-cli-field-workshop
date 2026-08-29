@@ -31,7 +31,7 @@ hide:
 
     [:octicons-arrow-right-24: 모듈 1 시작하기](sdlc-productivity.md)
 
-- :material-wrench:{ .lg .middle } **모듈 2 — 레거시 현대화 ⭐**
+- :material-wrench:{ .lg .middle } **모듈 2 — 레거시 현대화**
 
     ---
 

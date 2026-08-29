@@ -89,9 +89,9 @@ Confirm the schedule was accepted:
 
 ---
 
-## ⚠️ Field Gotchas & Failure Modes
+## Pro Tips & Key Watchouts
 
-!!! warning "Common Workshop Gotchas"
+!!! tip "Key Things to Watch For"
     1. **Timing `/btw`:** `/btw` is designed for in-flight steering. If the model has already completed generating its response and is idle, typing `/btw` will simply be processed as a standard new turn.
     2. **Session Resumption (`-c`):** Running `agy -c` connects to the most recently updated session in the current directory. If you want to resume a specific session across workspaces, provide the full session ID: `agy -c <conversation-id>`.
     3. **Background Daemon Persistence:** Scheduled jobs created via `/schedule` or sidecars run as background cron tasks managed by the CLI runtime. Ensure your machine does not enter deep sleep during scheduled execution windows.

@@ -92,9 +92,9 @@ agy --print "What do you know about this project?" --print-timeout 30s
 
 ---
 
-## ⚠️ Field Gotchas & Failure Modes
+## Pro Tips & Key Watchouts
 
-!!! warning "Common Workshop Gotchas"
+!!! tip "Key Things to Watch For"
     1. **Non-Git Directories:** If you launch `agy` in a folder without a `.git/` directory, repository auto-indexing and branch detection are disabled. Always initialize git (`git init`) or run from a git root.
     2. **Vague AGENTS.md:** If you simply ask for "an AGENTS.md", the model may produce generic boilerplate. Ensure your prompt asks for *project purpose, architecture rules, test commands, and styling conventions*.
     3. **First-Launch Auth:** On initial launch, your browser will open for Google Sign-In. If you are in a remote SSH session without a GUI browser, `agy` will print an authorization URL directly in your terminal.

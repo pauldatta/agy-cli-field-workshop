@@ -41,15 +41,15 @@ theme:
 
 nav:
   - Home: index.md
-  - "📦 Pre-Work":
+  - "Pre-Work":
       - Environment Setup: setup.md
-  - "🛠️ Workshop":
+  - "Workshop":
       - "1. SDLC Productivity": sdlc-productivity.md
-      - "2. Legacy Modernization ⭐": legacy-modernization.md
+      - "2. Legacy Modernization": legacy-modernization.md
       - "3. Building AGY Agents": agy-sdk.md
       - "4. Multi-Agent & Advanced": multi-agent-advanced.md
       - "5. ADK Agents with agents-cli": agents-cli.md
-  - "🧪 Exercises":
+  - "Exercises":
       - "First Session (ex01)": exercises/ex01_first_session.md
       - "Plugin Bridge (ex02)": exercises/ex02_plugin_bridge.md
       - "First Sidecar (ex02b)": exercises/ex02b_first_sidecar.md
@@ -66,7 +66,7 @@ nav:
       - "Autonomous Goals (ex13)": exercises/ex13_autonomous_goals_and_interviews.md
       - "Visual Diffs & UI (ex14)": exercises/ex14_visual_diffs_and_generative_ui.md
       - "Browser DevTools (ex15)": exercises/ex15_browser_devtools_mcp.md
-  - "📋 Resources":
+  - "Resources":
       - Cheatsheet: cheatsheet.md
       - Facilitator Guide: facilitator-guide.md
       - "Reference: Plugin Ecosystem": plugin-ecosystem.md

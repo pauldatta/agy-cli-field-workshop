@@ -153,9 +153,9 @@ git diff src/limiter.py
 
 ---
 
-## ⚠️ Field Gotchas & Failure Modes
+## Pro Tips & Key Watchouts
 
-!!! warning "Common Workshop Gotchas"
+!!! tip "Key Things to Watch For"
     1. **Vague `/goal` Criteria:** `/goal` works best when paired with an objective verification command (e.g. `pytest`, `mvn test`, `npm test`, or `make lint`). If the goal is subjective (e.g. "make the code look nicer"), the loop may terminate early.
     2. **Halting Infinite Loops:** If a test failure is impossible to resolve without architectural changes, you can stop the `/goal` loop at any time with **Ctrl+C**.
     3. **Interview Synthesis:** In `/grill-me` mode, always ask `agy` to output the final spec or ADR to a markdown artifact so downstream sessions or subagents can reference it.

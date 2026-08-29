@@ -77,9 +77,9 @@ Antigravity CLI allows pasting images, screenshots, and UI mockups directly into
 
 ---
 
-## ⚠️ Field Gotchas & Failure Modes
+## 实战提示与注意事项
 
-!!! warning "Common Workshop Gotchas"
+!!! tip "需要注意的关键细节"
     1. **Terminal Media Pasting:** Pasting images with `Ctrl+V` requires terminal graphics protocol support (e.g. iTerm2, Kitty, Ghostty, WezTerm, or VS Code integrated terminal). In basic terminals, `agy` will save the clipboard image to a local temporary path and reference it.
     2. **Local Port Proxies:** When running on remote cloud VMs, local dev server URLs (`http://localhost:3000`) cannot be reached from your local laptop browser. Use the provided hostname proxy format (`http://<hostname>.c.googlers.com:<PORT>`).
     3. **Artifact Directory Scoping:** HTML artifacts are generated in the session artifact directory (`~/.gemini/antigravity-cli/brain/<session-id>/`). They are isolated from your repository's working tree unless explicitly exported.

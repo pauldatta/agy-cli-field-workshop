@@ -31,7 +31,7 @@ hide:
 
     [:octicons-arrow-right-24: Start Module 1](sdlc-productivity.md)
 
-- :material-wrench:{ .lg .middle } **Module 2 — Legacy Modernization ⭐**
+- :material-wrench:{ .lg .middle } **Module 2 — Legacy Modernization**
 
     ---
 

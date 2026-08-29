@@ -31,7 +31,7 @@ hide:
 
     [:octicons-arrow-right-24: Mulai Modul 1](sdlc-productivity.md)
 
-- :material-wrench:{ .lg .middle } **Modul 2 — Modernisasi Legacy ⭐**
+- :material-wrench:{ .lg .middle } **Modul 2 — Modernisasi Legacy**
 
     ---
 

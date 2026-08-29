@@ -6,7 +6,7 @@ Content-specific changes to workshop materials — CLI breakages, deprecated com
 
 ## 2026-08-29
 
-### 🚀 Added Exercises 13–15 & Enhanced Field Gotchas & Timing
+### 🚀 Added Exercises 13–15 & Enhanced Pro Tips & Watchouts & Timing
 
 **Affects:** `docs/exercises/`, `exercises/`, `mkdocs.yml`, `docs/index.md`, `AUDIT.md`
 
@@ -21,7 +21,7 @@ Content-specific changes to workshop materials — CLI breakages, deprecated com
   - Automated bug fixing directly from browser console errors and network evidence.
 - **Field Timing & Gotchas Calibrations:**
   - Enhanced `ex01` through `ex11` with realistic fast/average/thorough timing estimates.
-  - Added "⚠️ Field Gotchas & Failure Modes" sections to `ex01`, `ex02`, `ex04`, `ex05`, `ex09`, `ex10`, and `ex11`.
+  - Added "💡 Pro Tips & Key Watchouts" sections to `ex01`, `ex02`, `ex04`, `ex05`, `ex09`, `ex10`, and `ex11`.
 
 ### ✅ Antigravity 2.11 / CLI v1.1.22 / SDK v0.1.15 Modernization Audit & Fixes
 

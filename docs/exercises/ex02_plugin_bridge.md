@@ -100,9 +100,9 @@ git checkout samples/plugins/workshop-helpers/plugin.json
 
 ---
 
-## ⚠️ Field Gotchas & Failure Modes
+## Pro Tips & Key Watchouts
 
-!!! warning "Common Workshop Gotchas"
+!!! tip "Key Things to Watch For"
     1. **Fresh Machine False-Alarm:** `agy plugin import gemini` looks for `~/.gemini/extensions/`. If you've never used Gemini CLI on this machine, it reports 0 imported plugins. This is normal — use `agy plugin install ./samples/plugins/workshop-helpers/` to proceed.
     2. **Staged Paths:** Imported plugins are staged into `~/.gemini/antigravity-cli/plugins/`. If you modify a plugin source file afterwards, re-run `agy plugin validate` or reinstall to update the staged copy.
     3. **Name Collisions:** If two plugins export a command with the same name, the most recently installed plugin takes precedence. Use `agy plugin list` to inspect component mappings.
