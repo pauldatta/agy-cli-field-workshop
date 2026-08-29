@@ -140,6 +140,14 @@ This PRD is designed to test the agent's ability to:
 5. **Verify its own work** — run `mvn clean verify` after each phase and fix any breakages
 6. **Use `/rewind`** if a phase goes wrong — especially useful after the security config rewrite
 
+## ⚠️ Field Gotchas & Failure Modes
+
+!!! warning "Common Workshop Gotchas"
+    1. **Toolchain Preflight:** If participants are actually building and executing tests locally, Java 21 JDK (`java -version`) and Maven 3.8+ (`mvn -version`) must be installed. If running in simulated migration mode, `agy` can still perform code edits and test generation without a local JDK.
+    2. **`javax.sql.*` False Positives:** Automated find-and-replace scripts often blindly replace `javax.sql.*` with `jakarta.sql.*`. The `javax.sql.DataSource` package remains part of the core Java SE runtime and must **not** be renamed.
+    3. **Spring Security 6 Lambda DSL:** Spring Security 6 requires the lambda DSL for `HttpSecurity` (e.g. `http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())`). Old method-chaining patterns will not compile.
+    4. **JAXB in Java 21:** Java 21 removes JAXB from the standard library. If compilation errors cite `jakarta.xml.bind.JAXBException`, ensure `jakarta.xml.bind:jakarta.xml.bind-api` and `org.glassfish.jaxb:jaxb-runtime` are declared in `pom.xml`.
+
 ## Acceptance Criteria
 
 - [ ] An `AGENTS.md` exists in the project root encoding the migration context
@@ -153,3 +161,4 @@ This PRD is designed to test the agent's ability to:
 ## Target Repository
 
 [Spring PetClinic REST](https://github.com/spring-petclinic/spring-petclinic-rest) at tag [`v2.6.2`](https://github.com/spring-petclinic/spring-petclinic-rest/tree/v2.6.2) — Spring Boot 2.6.2, Java 8, with Spring Security and OpenAPI.
+

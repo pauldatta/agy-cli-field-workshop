@@ -1,12 +1,12 @@
 # Exercise 4: Subagents
 
-> **Duration:** 20 min | **Module:** 4 — Multi-Agent & Advanced
+> **Duration:** 20 min (Fast: 15 min · Average: 20 min · Thorough: 30 min) | **Module:** 4 — Multi-Agent & Advanced
 
 ---
 
 ## Objective
 
-Spawn parallel subagents on your codebase, practice the adversarial reviewer pattern, and observe isolated execution.
+Spawn parallel subagents on your codebase, practice the adversarial reviewer pattern, navigate subagent approvals with keyboard shortcuts (`Alt+J` / `Ctrl+K`), and master isolated execution modes (`branch` vs `inherit`).
 
 ---
 
@@ -28,7 +28,11 @@ Dispatch a parallel audit team:
 > Report back when both complete with a combined findings summary.
 ```
 
-While they run, ask:
+While they run:
+
+* Press **`Alt+J`** to teleport focus directly to the next pending subagent approval or running task.
+* Press **`Ctrl+K`** to fast-approve permission requests from subagents without leaving your current prompt.
+* Or ask in chat:
 
 ```text
 > What's the status of the subagents?
@@ -75,9 +79,20 @@ Note the difference from branch mode: `inherit` means the subagent works in the 
 
 ---
 
+## ⚠️ Field Gotchas & Failure Modes
+
+!!! warning "Common Workshop Gotchas"
+    1. **Interactive Mode Requirement:** Subagent dispatch (`invoke_subagent`) only functions in interactive TUI mode. Running a script with `agy --print` cannot spawn background subagents.
+    2. **Branch vs Inherit Mode:** `branch` workspace creates an isolated git worktree copy. Modifications made in a `branch` subagent do not touch your active working directory until explicitly committed or merged.
+    3. **Teleport Keybindings:** Remember to use **`Alt+J`** (Option+J on macOS) to teleport between subagents. On macOS Terminal, ensure "Use Option as Meta key" is checked in your terminal preferences if `Alt+J` sends special characters.
+
+---
+
 ## Completion Criteria
 
 - [ ] Spawned at least 2 parallel subagents successfully
+- [ ] Navigated approvals using `Alt+J` or `Ctrl+K`
 - [ ] Both subagents ran and returned findings
 - [ ] Adversarial reviewer returned critical findings
 - [ ] Used at least two different workspace modes (branch vs inherit)
+

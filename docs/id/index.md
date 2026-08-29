@@ -25,9 +25,9 @@ hide:
 
     ---
 
-    Sesi Antigravity CLI pertama Anda. Jelaskan, refaktor, uji, tinjau — plus memperluas toolchain Anda dengan plugin dalam satu perintah.
+    Sesi Antigravity CLI pertama Anda. Jelaskan, refaktor, uji, tinjau — plus target otonom (`/goal`), wawancara kebutuhan (`/grill-me`), diff visual, dan plugin.
 
-    **75 menit** · Bagian 1.0–1.7
+    **75 menit** · Latihan: ex01–ex03, ex13, ex14
 
     [:octicons-arrow-right-24: Mulai Modul 1](sdlc-productivity.md)
 
@@ -37,7 +37,7 @@ hide:
 
     Modul unggulan. Migrasikan basis kode legacy nyata (.NET atau Java) menggunakan mode ketat, orientasi mandiri agen, dan perencanaan sub-agen.
 
-    **90 menit** · Latihan: ex08, ex09
+    **90 menit** · Latihan: ex07–ex09
 
     [:octicons-arrow-right-24: Mulai Modul 2](legacy-modernization.md)
 
@@ -55,9 +55,9 @@ hide:
 
     ---
 
-    Munculkan sub-agen yang terisolasi, arahkan tugas di tengah jalan dengan `/btw`, jadwalkan pekerjaan berulang, dan lanjutkan sesi yang berjalan lama berdasarkan ID.
+    Munculkan sub-agen yang terisolasi, arahkan tugas di tengah jalan dengan `/btw`, jadwalkan pekerjaan berulang, otomatisasikan pengujian browser via DevTools MCP, dan lanjutkan sesi.
 
-    **60 menit** · Latihan: ex04–ex06
+    **60 menit** · Latihan: ex04–ex06, ex15
 
     [:octicons-arrow-right-24: Mulai Modul 4](multi-agent-advanced.md)
 

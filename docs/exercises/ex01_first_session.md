@@ -1,12 +1,12 @@
 # Exercise 1: First Session
 
-> **Duration:** 15 min | **Module:** 1 — SDLC Productivity
+> **Duration:** 15 min (Fast: 10 min · Average: 15 min · Thorough: 20 min) | **Module:** 1 — SDLC Productivity
 
 ---
 
 ## Objective
 
-Launch agy-cli, explore a codebase, and create an AGENTS.md that makes every future session smarter.
+Launch agy-cli, explore an unfamiliar codebase with interactive questions and `@` path autocomplete, and create a production `AGENTS.md` that makes every future session smarter.
 
 ---
 
@@ -36,17 +36,23 @@ At the prompt, ask:
 > What does this project do? Give me a one-paragraph summary.
 ```
 
-Then follow up:
+Then follow up with interactive file mentions using `@` autocomplete:
 
 ```text
 > What are the top 3 files I should read to understand the core logic?
 ```
 
 ```text
-> Are there any obvious code quality issues or tech debt?
+> @README.md How does the documented architecture match the actual codebase implementation?
 ```
 
-**Notice:** agy read your files without you having to specify them. It indexed the git repo automatically.
+Check active session context and token usage:
+
+```text
+> /context
+```
+
+**Notice:** agy reads and indexes your git repository automatically without requiring manual file uploads.
 
 ---
 
@@ -59,7 +65,7 @@ Pick one file from agy's suggestions and go deeper:
 ```
 
 ```text
-> If I wanted to add [a simple feature], where would I start?
+> If I wanted to add a health-check endpoint or logging middleware, where would I start?
 ```
 
 ---
@@ -78,7 +84,7 @@ Review what agy generates. Edit it if anything is wrong. Then write it:
 > Write that AGENTS.md to the project root.
 ```
 
-Start a new session and verify it works:
+Start a new headless session and verify the context is loaded:
 
 ```bash
 agy --print "What do you know about this project?" --print-timeout 30s
@@ -86,9 +92,19 @@ agy --print "What do you know about this project?" --print-timeout 30s
 
 ---
 
+## ⚠️ Field Gotchas & Failure Modes
+
+!!! warning "Common Workshop Gotchas"
+    1. **Non-Git Directories:** If you launch `agy` in a folder without a `.git/` directory, repository auto-indexing and branch detection are disabled. Always initialize git (`git init`) or run from a git root.
+    2. **Vague AGENTS.md:** If you simply ask for "an AGENTS.md", the model may produce generic boilerplate. Ensure your prompt asks for *project purpose, architecture rules, test commands, and styling conventions*.
+    3. **First-Launch Auth:** On initial launch, your browser will open for Google Sign-In. If you are in a remote SSH session without a GUI browser, `agy` will print an authorization URL directly in your terminal.
+
+---
+
 ## Completion Criteria
 
 - [ ] agy launched and responded in interactive mode
-- [ ] Explored at least 3 follow-up questions
-- [ ] AGENTS.md exists at the project root
+- [ ] Explored at least 3 follow-up questions using `@` autocomplete and `/context`
+- [ ] AGENTS.md exists at the project root with concrete conventions
 - [ ] `agy --print "What do you know about this project?"` returns accurate info
+

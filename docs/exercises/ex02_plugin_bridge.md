@@ -1,22 +1,22 @@
 # Exercise 2: Plugin Bridge
 
-> **Duration:** 20 min | **Module:** 2 — Plugin Ecosystem
+> **Duration:** 20 min (Fast: 12 min · Average: 18 min · Thorough: 25 min) | **Module:** 2 — Plugin Ecosystem
 
 ---
 
 ## Objective
 
-Import your existing plugin library into Antigravity CLI, selectively enable/disable plugins, and validate a sample custom plugin.
+Import an existing plugin library into Antigravity CLI, selectively enable/disable plugins, and validate and install custom workspace plugins.
 
 ---
 
 ## Part 1: Import Plugins (7 min)
 
 ```bash
-# Check what's currently in agy
+# Check what's currently active in agy
 agy plugin list
 
-# Import everything from Gemini CLI
+# Import everything from your Gemini CLI setup
 agy plugin import gemini
 ```
 
@@ -27,17 +27,21 @@ Read the output carefully:
 - Were any skipped? Why?
 
 ```bash
-# See the updated list
+# See the updated list formatted as JSON
 agy plugin list | python3 -m json.tool
 ```
 
-**Question:** What plugins are now available that weren't before?
+!!! tip "Fresh Machine Fallback"
+    If you are running on a brand-new laptop without existing Gemini CLI plugins, `agy plugin import gemini` will report `0 plugins found`. To test the plugin workflow immediately, install the local sample plugin provided in this repository:
+    ```bash
+    agy plugin install ./samples/plugins/workshop-helpers/
+    ```
 
 ---
 
 ## Part 2: Test an Imported Plugin (5 min)
 
-Launch agy and try a command from one of the imported plugins:
+Launch agy and try a command from one of the imported or installed plugins:
 
 ```bash
 agy
@@ -49,10 +53,10 @@ If `code-review` was imported:
 > /code-review Review the main entry point of this project.
 ```
 
-If `gemini-deep-research` was imported:
+If `workshop-helpers` was installed:
 
 ```text
-> Use the deep research capability to find best practices for error handling in Node.js APIs.
+> What custom skills or helper commands are available from my installed plugins?
 ```
 
 ---
@@ -60,44 +64,55 @@ If `gemini-deep-research` was imported:
 ## Part 3: Disable and Re-enable (3 min)
 
 ```bash
-# Disable a plugin you just imported
-agy plugin disable <plugin-name>
+# Disable a plugin you just imported/installed
+agy plugin disable workshop-helpers   # or your imported plugin name
 
-# Confirm it's disabled
+# Confirm it is marked inactive
 agy plugin list | python3 -m json.tool
 
 # Re-enable it
-agy plugin enable <plugin-name>
+agy plugin enable workshop-helpers
 ```
 
 ---
 
 ## Part 4: Validate the Sample Plugin (5 min)
 
-The workshop repo includes a sample plugin:
+The workshop repository includes a pre-packaged sample plugin:
 
 ```bash
 ls samples/plugins/workshop-helpers/
 
-# Validate its structure
+# Validate its plugin.json manifest and directory structure
 agy plugin validate samples/plugins/workshop-helpers/
 ```
 
-Then intentionally break it and see what validation catches:
+Now intentionally break the manifest to see how validation diagnostics work:
 
 ```bash
-# Edit the manifest to remove a required field (use any text editor)
-# Then re-validate
+# Edit plugin.json (e.g. remove the "name" or "components" key)
+# Then re-validate to see the schema error
 agy plugin validate samples/plugins/workshop-helpers/
+
+# Restore the original manifest
+git checkout samples/plugins/workshop-helpers/plugin.json
 ```
 
-Restore the manifest when done.
+---
+
+## ⚠️ Field Gotchas & Failure Modes
+
+!!! warning "Common Workshop Gotchas"
+    1. **Fresh Machine False-Alarm:** `agy plugin import gemini` looks for `~/.gemini/extensions/`. If you've never used Gemini CLI on this machine, it reports 0 imported plugins. This is normal — use `agy plugin install ./samples/plugins/workshop-helpers/` to proceed.
+    2. **Staged Paths:** Imported plugins are staged into `~/.gemini/antigravity-cli/plugins/`. If you modify a plugin source file afterwards, re-run `agy plugin validate` or reinstall to update the staged copy.
+    3. **Name Collisions:** If two plugins export a command with the same name, the most recently installed plugin takes precedence. Use `agy plugin list` to inspect component mappings.
 
 ---
 
 ## Completion Criteria
 
-- [ ] `agy plugin import` ran successfully and imported at least one plugin
-- [ ] Tested at least one command from an imported plugin
+- [ ] `agy plugin import` or `agy plugin install` ran successfully
+- [ ] Tested at least one command/skill from an active plugin
 - [ ] Successfully disabled and re-enabled a plugin
-- [ ] `agy plugin validate` returned a valid result on the sample plugin
+- [ ] `agy plugin validate` caught schema errors on a broken manifest and passed on a valid one
+

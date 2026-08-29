@@ -6,6 +6,23 @@ Content-specific changes to workshop materials — CLI breakages, deprecated com
 
 ## 2026-08-29
 
+### 🚀 Added Exercises 13–15 & Enhanced Field Gotchas & Timing
+
+**Affects:** `docs/exercises/`, `exercises/`, `mkdocs.yml`, `docs/index.md`, `AUDIT.md`
+
+- **New Exercise 13 (`ex13_autonomous_goals_and_interviews.md`):**
+  - Requirements interviews with `/grill-me` generating formal Architecture Decision Records (ADRs).
+  - Autonomous loops with `/goal` iterating on test execution and bug remediation with zero human babysitting.
+- **New Exercise 14 (`ex14_visual_diffs_and_generative_ui.md`):**
+  - Interactive Generative UI dashboards and system topology maps rendered live in the artifact pane.
+  - Visual semantic code review with `/diff`, `Ctrl+R`, and inline clipboard media ingestion with `Ctrl+V`.
+- **New Exercise 15 (`ex15_browser_devtools_mcp.md`):**
+  - Chrome DevTools MCP server configuration and automated `/browser` navigation, clicking, and form filling.
+  - Automated bug fixing directly from browser console errors and network evidence.
+- **Field Timing & Gotchas Calibrations:**
+  - Enhanced `ex01` through `ex11` with realistic fast/average/thorough timing estimates.
+  - Added "⚠️ Field Gotchas & Failure Modes" sections to `ex01`, `ex02`, `ex04`, `ex05`, `ex09`, `ex10`, and `ex11`.
+
 ### ✅ Antigravity 2.11 / CLI v1.1.22 / SDK v0.1.15 Modernization Audit & Fixes
 
 **Affects:** All documentation, exercises 02b, 07, 10, 11, AUDIT.md, research grounding data

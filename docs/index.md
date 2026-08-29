@@ -25,9 +25,9 @@ hide:
 
     ---
 
-    Your first Antigravity CLI session. Explain, refactor, test, review — plus extending your toolchain with plugins in one command.
+    Your first Antigravity CLI session. Explain, refactor, test, review — plus autonomous goals (`/goal`), requirements interviews (`/grill-me`), visual diffs, and plugins.
 
-    **75 min** · Sections 1.0–1.7
+    **75 min** · Exercises: ex01–ex03, ex13, ex14
 
     [:octicons-arrow-right-24: Start Module 1](sdlc-productivity.md)
 
@@ -37,7 +37,7 @@ hide:
 
     The flagship module. Migrate a real legacy codebase (.NET or Java) using strict mode, agent self-onboarding, and subagent planning.
 
-    **90 min** · Exercises: ex08, ex09
+    **90 min** · Exercises: ex07–ex09
 
     [:octicons-arrow-right-24: Start Module 2](legacy-modernization.md)
 
@@ -55,9 +55,9 @@ hide:
 
     ---
 
-    Spawn isolated subagents, steer tasks mid-flight with `/btw`, schedule recurring jobs, and resume long-running sessions by ID.
+    Spawn isolated subagents, steer tasks mid-flight with `/btw`, schedule recurring jobs, automate browser testing via DevTools MCP, and resume sessions by ID.
 
-    **60 min** · Exercises: ex04–ex06
+    **60 min** · Exercises: ex04–ex06, ex15
 
     [:octicons-arrow-right-24: Start Module 4](multi-agent-advanced.md)
 

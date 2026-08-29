@@ -396,6 +396,15 @@ gcloud run deploy my-pipeline \
 
 ---
 
+## ⚠️ Field Gotchas & Failure Modes
+
+!!! warning "Common Workshop Gotchas"
+    1. **Missing `save_dir`:** If `save_dir` is omitted from the initial `LocalAgentConfig`, the agent's message trajectory remains ephemeral in memory. Attempting to resume with `conversation_id` in a separate process will fail to find prior history. Always configure `save_dir=".sessions"`.
+    2. **Structured Output Model Constraints:** `response_schema` requires modern models (e.g., `gemini-3.7-flash`, `gemini-3.5-flash`, `gemini-3.1-pro`). If using custom endpoint proxies, ensure schema validation headers are preserved.
+    3. **Cloud Run Container Sizing:** Multi-agent pipelines generating large compliance documents require at least 1–2 GB of container RAM for Python runtime and async tasks. Use `--memory 2Gi` on `gcloud run deploy`.
+
+---
+
 ## Completion Criteria
 
 - [ ] GDPR `SKILL.md` created and loaded by the writer agent via `skills_paths`

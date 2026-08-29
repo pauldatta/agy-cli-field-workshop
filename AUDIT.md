@@ -258,11 +258,25 @@ Official source: [agents-cli Docs](https://google.github.io/agents-cli/) and [ag
 
 ---
 
+## 10. Autonomous Loops, Generative UI, and DevTools MCP (Exercises 13–15)
+
+Official sources: [Using Antigravity CLI](https://antigravity.google/docs/cli-using), [MCP](https://antigravity.google/docs/mcp)
+
+| # | Claim | Official Source |
+|:--|:------|:---|
+| 10.1 | `/grill-me` engages an interactive requirements elicitation interview with multiple-choice clarifying questions before code generation. | [Using Antigravity CLI](https://antigravity.google/docs/cli-using) |
+| 10.2 | `/goal` runs an autonomous self-correcting loop executing code modifications, test suites, and bug fixes until objective is met. | [Using Antigravity CLI](https://antigravity.google/docs/cli-using) |
+| 10.3 | `/diff` and `Ctrl+R` open visual side-by-side / unified semantic diff review before applying file changes. | [Using Antigravity CLI](https://antigravity.google/docs/cli-using) |
+| 10.4 | Antigravity CLI renders interactive HTML/SVG Generative UI artifacts directly in preview panels. | [Using Antigravity CLI](https://antigravity.google/docs/cli-using) |
+| 10.5 | Chrome DevTools / Puppeteer MCP server enables browser navigation, element interaction, console log inspection, and DOM snapshots via `/browser`. | [MCP Docs](https://antigravity.google/docs/mcp) |
+
+---
+
 ## Summary
 
 | Count | Category |
 |:---:|:---|
-| 115 | Claims confirmed against official Antigravity CLI documentation |
+| 120 | Claims confirmed against official Antigravity CLI documentation |
 | 3 | Workshop-original pedagogical patterns (`/btw`, "Propose, Review, Apply", "Pre-Commit Review") |
 
 ---

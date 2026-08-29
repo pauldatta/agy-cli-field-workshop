@@ -353,6 +353,15 @@ python main.py /path/to/your/project/src
 
 ---
 
+## ⚠️ Field Gotchas & Failure Modes
+
+!!! warning "Common Workshop Gotchas"
+    1. **`ToolContext` Schema Stripping:** Never pass `ctx` from prompts. The SDK auto-injects `ctx: ToolContext` at runtime. If your prompt mentions `ctx`, the model may attempt to hallucinate an argument.
+    2. **API Key & Project Auth:** Ensure `export GEMINI_API_KEY="..."` is set in your active shell or `gcloud auth application-default login` has been executed for Vertex AI project access.
+    3. **Hook Return Signatures:** `HookResult` only accepts `allow: bool`. Do not pass deprecated `message="..."` or `reason="..."` arguments.
+
+---
+
 ## Completion Criteria
 
 - [ ] Three tools defined: `read_file`, `list_directory`, `record_finding` (with `ToolContext`)

@@ -25,9 +25,9 @@ hide:
 
     ---
 
-    您的第一次 Antigravity CLI 会话。解释、重构、测试、审查 — 加上通过一条命令使用插件扩展您的工具链。
+    您的第一次 Antigravity CLI 会话。解释、重构、测试、审查 — 加上自主目标 (`/goal`)、需求访谈 (`/grill-me`)、可视化 diff 与插件。
 
-    **75 分钟** · 第 1.0–1.7 节
+    **75 分钟** · 练习：ex01–ex03, ex13, ex14
 
     [:octicons-arrow-right-24: 开始模块 1](sdlc-productivity.md)
 
@@ -37,7 +37,7 @@ hide:
 
     旗舰模块。使用严格模式、代理自我引导和子代理规划来迁移真实的遗留代码库（.NET 或 Java）。
 
-    **90 分钟** · 练习：ex08, ex09
+    **90 分钟** · 练习：ex07–ex09
 
     [:octicons-arrow-right-24: 开始模块 2](legacy-modernization.md)
 
@@ -55,9 +55,9 @@ hide:
 
     ---
 
-    生成隔离的子代理，使用 `/btw` 在运行中途引导任务，调度周期性作业，并通过 ID 恢复长时间运行的会话。
+    生成隔离的子代理，使用 `/btw` 在运行中途引导任务，调度周期性作业，通过 DevTools MCP 自动化浏览器测试，并通过 ID 恢复会话。
 
-    **60 分钟** · 练习：ex04–ex06
+    **60 分钟** · 练习：ex04–ex06, ex15
 
     [:octicons-arrow-right-24: 开始模块 4](multi-agent-advanced.md)
 

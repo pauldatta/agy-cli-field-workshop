@@ -25,9 +25,9 @@ hide:
 
     ---
 
-    첫 번째 Antigravity CLI 세션입니다. 코드 설명, 리팩토링, 테스트, 리뷰와 더불어 단일 명령으로 플러그인을 사용하여 툴체인을 확장하는 방법을 알아봅니다.
+    첫 번째 Antigravity CLI 세션입니다. 코드 설명, 리팩토링, 테스트, 리뷰와 더불어 자율 목표(`/goal`), 요구사항 인터뷰(`/grill-me`), 시각적 diff 및 플러그인을 알아봅니다.
 
-    **75분** · 섹션 1.0–1.7
+    **75분** · 연습 문제: ex01–ex03, ex13, ex14
 
     [:octicons-arrow-right-24: 모듈 1 시작하기](sdlc-productivity.md)
 
@@ -37,7 +37,7 @@ hide:
 
     가장 핵심적인 모듈입니다. 엄격한 모드, 에이전트 자체 온보딩 및 서브에이전트 계획을 사용하여 실제 레거시 코드베이스(.NET 또는 Java)를 마이그레이션합니다.
 
-    **90분** · 연습 문제: ex08, ex09
+    **90분** · 연습 문제: ex07–ex09
 
     [:octicons-arrow-right-24: 모듈 2 시작하기](legacy-modernization.md)
 
@@ -45,19 +45,19 @@ hide:
 
     ---
 
-    Antigravity SDK를 사용하여 프로덕션 에이전트를 구축합니다. 도구, 세션 상태, 다중 에이전트 오케스트레이션 및 Cloud Run에 배포하는 방법을 다룹니다.
+    Antigravity SDK로 프로덕션 에이전트를 구축합니다. 도구, 세션 상태, 다중 에이전트 오케스트레이션 및 Cloud Run 배포를 다룹니다.
 
     **90분** · 연습 문제: ex10, ex11
 
     [:octicons-arrow-right-24: 모듈 3 시작하기](agy-sdk.md)
 
-- :material-sitemap:{ .lg .middle } **모듈 4 — 다중 에이전트 및 고급 패턴**
+- :material-sitemap:{ .lg .middle } **모듈 4 — 다중 에이전트 및 고급 기능**
 
     ---
 
-    격리된 서브에이전트를 생성하고, `/btw`를 사용하여 진행 중인 작업을 스티어링하며, 반복 작업을 예약하고, ID를 통해 장기 실행 세션을 재개합니다.
+    격리된 서브에이전트를 생성하고, `/btw`로 실행 중 작업을 제어하며, 반복 작업을 예약하고, DevTools MCP로 브라우저 테스트를 자동화합니다.
 
-    **60분** · 연습 문제: ex04–ex06
+    **60분** · 연습 문제: ex04–ex06, ex15
 
     [:octicons-arrow-right-24: 모듈 4 시작하기](multi-agent-advanced.md)
 

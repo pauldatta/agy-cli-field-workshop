@@ -63,6 +63,9 @@ nav:
       - "First Agent (ex10)": exercises/ex10_first_agent.md
       - "Multi-Agent Pipeline (ex11)": exercises/ex11_multi_agent_pipeline.md
       - "ADK Agent Lifecycle (ex12)": exercises/ex12_agents_cli_lifecycle.md
+      - "Autonomous Goals (ex13)": exercises/ex13_autonomous_goals_and_interviews.md
+      - "Visual Diffs & UI (ex14)": exercises/ex14_visual_diffs_and_generative_ui.md
+      - "Browser DevTools (ex15)": exercises/ex15_browser_devtools_mcp.md
   - "📋 Resources":
       - Cheatsheet: cheatsheet.md
       - Facilitator Guide: facilitator-guide.md
