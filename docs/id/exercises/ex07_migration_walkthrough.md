@@ -104,7 +104,7 @@ cp .gemini/settings.json .agents/settings.json
 
 ```bash
 # AGY uses mcp.json, not mcpServers in settings.json
-cat > .agents/mcp.json << 'EOF'
+cat > .agents/mcp_config.json << 'EOF'
 {
   "mcpServers": {
     "github": {

@@ -36,7 +36,7 @@ or locally via `make precommit`. Run the full suite with `make precommit`.
 
 # Workshop Content Audit — Grounded Against Official Sources
 
-> **Audit date:** 2026-05-25 (v5 — confirmed current state only)
+> **Audit date:** 2026-08-29 (v6 — confirmed against Antigravity 2.11 / CLI 1.1.22 / SDK 0.1.15)
 > **Auditor:** Antigravity Agent (Chrome DevTools MCP + live binary)
 > **Workshop:** [Antigravity CLI Field Workshop](https://github.com/pauldatta/agy-cli-field-workshop)
 
@@ -104,10 +104,10 @@ Official source: [CLI Features — Core Slash Commands](https://antigravity.goog
 
 | # | Command | Official Source |
 |:--|:------|:---|
-| 3.1 | `/resume` (alias `/switch`) — conversation picker | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_213–5_219 |
+| 3.1 | `/resume` (aliases `/switch`, `/conversation`) — conversation picker | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_213–5_219 |
 | 3.2 | `/rewind` (alias `/undo`) — roll back conversation history | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_220–5_226 |
 | 3.3 | `/rename <name>` — rename active conversation thread | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_227–5_229 |
-| 3.4 | `/permissions` — set autonomy level (`request-review`, `always-proceed`, `strict`) | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_230–5_238 |
+| 3.4 | `/permissions` — set autonomy level (`request-review`, `proceed-in-sandbox`, `always-proceed`, `strict`) | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_230–5_238 |
 | 3.5 | `/model` — select default reasoning model (persists across sessions) | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_239–5_241 |
 | 3.6 | `/keybindings` — open keyboard shortcut editor | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_242–5_244 |
 | 3.7 | `/statusline` — customize CLI status bar | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_245–5_247 |
@@ -117,10 +117,26 @@ Official source: [CLI Features — Core Slash Commands](https://antigravity.goog
 | 3.11 | `/open <path>` — open file in external editor | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_257–5_259 |
 | 3.12 | `/usage` — inline interactive help manual | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_260–5_262 |
 | 3.13 | `/logout` — log out and clear cached credentials | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_263–5_265 |
-| 3.14 | `/agents` — subagents panel | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_289–5_295: "Type `/agents` in the prompt to open the subagents panel" |
+| 3.14 | `/agents` — subagents panel | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_289–5_295 |
 | 3.15 | `/config` / `/settings` — settings overlay | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_166–3_169 |
-| 3.16 | `/clear` — clear prompt and start new session (quick tips only) | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_225: "Use `/clear` to clear the prompt and start a new conversation session" |
-| 3.17 | `/fork` — spin up a separate workspace (quick tips only) | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_221 |
+| 3.16 | `/clear` (alias `/new`) — clear prompt and start new session | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_225 |
+| 3.17 | `/fork` (alias `/branch`) — spin up a separate workspace | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_221 |
+| 3.18 | `/teamwork-preview` (alias `/teamwork`) — launch collaborative agent team | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.19 | `/diff` — open interactive git diff viewer | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.20 | `/btw <query>` — mid-flight task steering | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.21 | `/goal` — autonomous goal-directed loop | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.22 | `/grill-me` — interactive requirements interview | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.23 | `/schedule` — schedule background cron or timer tasks | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.24 | `/browser` — launch Chrome DevTools browser automation | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.25 | `/fast` — toggle fast reasoning mode | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.26 | `/planning` — toggle multi-turn plan generation mode | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.27 | `/voice` (alias `/record`) — toggle voice prompt dictation | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.28 | `/context` — view active context token usage and files | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.29 | `/credits` (alias `/quota`) — view G1 credit balance and quota | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.30 | `/hooks` — browse active script and JSON hooks | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.31 | `/copy` — copy last agent response to clipboard | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.32 | `/help` — list all slash commands | [cli-features](https://antigravity.google/docs/cli-features) |
+| 3.33 | `/exit` (alias `/quit`) — exit CLI session | [cli-features](https://antigravity.google/docs/cli-features) |
 
 ---
 
@@ -130,22 +146,26 @@ Official source: [cli-using — Quick Tips](https://antigravity.google/docs/cli-
 
 | # | Claim | Official Source |
 |:--|:------|:---|
-| 4.1 | `@` — file path autocomplete | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_187–3_189: "`@` will trigger path suggestions" |
-| 4.2 | `!` — run terminal commands directly | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_194–3_197: "Use `!` at the start of your prompt to run terminal commands directly" |
-| 4.3 | `esc esc` — clear prompt box | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_190–3_193: "Type `esc esc` to clear your prompt box (when no streaming is active)" |
-| 4.4 | `?` — get help and list slash commands | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_198–3_201: "Type `?` to get help and list all slash commands" |
+| 4.1 | `@` — file path autocomplete | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_187–3_189 |
+| 4.2 | `!` — run terminal commands directly | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_194–3_197 |
+| 4.3 | `esc esc` — clear prompt box | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_190–3_193 |
+| 4.4 | `?` — get help and list slash commands | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_198–3_201 |
 | 4.5 | `/rewind` or `/undo` to go back in conversation | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_213–3_220 |
 | 4.6 | `/fork` to spin up a separate workspace | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_219–3_224 |
 | 4.7 | `/clear` to clear and start new session | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_223–3_228 |
 | 4.8 | `/resume` to list and resume previous conversation logs | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_227–3_232 |
-| 4.9 | When you close the CLI, it prints the exact resume command | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_231–3_234: "When you close the CLI, it automatically prints the exact command needed to resume that specific session" |
-| 4.10 | `alt+enter` / `ctrl+j` / `shift+enter` — insert newline | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_324–3_332: all three key combos listed for "Insert Newline" |
-| 4.11 | `ctrl+g` — open editor for prompt | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_276–3_280: "Edit prompt inside your default shell editor" |
+| 4.9 | When you close the CLI, it prints the exact resume command | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_231–3_234 |
+| 4.10 | `alt+enter` / `shift+enter` / `ctrl+j` — insert newline | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_324–3_332 |
+| 4.11 | `ctrl+g` — open editor for prompt | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_276–3_280 |
 | 4.12 | `ctrl+l` — clear TUI screen | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_250–3_254 |
-| 4.13 | `ctrl+d` — exit CLI | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_261–3_265 |
+| 4.13 | `ctrl+d` — exit CLI (or forward delete character) | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_261–3_265 |
 | 4.14 | `ctrl+z` — suspend CLI to background | [cli-using](https://antigravity.google/docs/cli-using) — uid 3_264–3_268 |
-| 4.15 | `ctrl+j` in `/agents` — teleport to pending subagent approval | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_307–5_309: "Use the keyboard shortcut `ctrl+j` to 'teleport' from the main conversation directly to the detailed view of the next subagent waiting for your approval" |
-| 4.16 | `ctrl+k` — fast-approve subagent permission | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_314–5_316: "You can approve a pending subagent permission instantly using `ctrl+k`" |
+| 4.15 | `alt+j` — teleport to pending subagent approval | [cli-features](https://antigravity.google/docs/cli-features) |
+| 4.16 | `ctrl+k` — fast-approve subagent permission | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_314–5_316 |
+| 4.17 | `ctrl+o` — toggle reasoning trajectory expansion | [cli-using](https://antigravity.google/docs/cli-using) |
+| 4.18 | `ctrl+r` — open artifact review panel | [cli-using](https://antigravity.google/docs/cli-using) |
+| 4.19 | `ctrl+v` — paste graphic media / clipboard | [cli-using](https://antigravity.google/docs/cli-using) |
+| 4.20 | `f5` — toggle voice dictation | [cli-using](https://antigravity.google/docs/cli-using) |
 
 ---
 
@@ -213,7 +233,7 @@ Official source: [CLI Features — Subagents](https://antigravity.google/docs/cl
 | 8.1 | Subagents run concurrently with main conversation | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_279: "asynchronous subagents framework … parallel work … without blocking your active conversation" |
 | 8.2 | `/agents` opens the subagents panel | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_289–5_295 |
 | 8.3 | Panel shows status: running, done, killed | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_296–5_300 |
-| 8.4 | `ctrl+j` — teleport to next pending subagent approval | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_307–5_309 |
+| 8.4 | `alt+j` — teleport to next pending subagent approval | [cli-features](https://antigravity.google/docs/cli-features) |
 | 8.5 | `ctrl+k` — fast-approve from main conversation | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_314–5_316 |
 | 8.6 | Main agent controls what tools and permissions subagents get | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_288 |
 | 8.7 | Fine-grained permissions: `"allow": ["command(git)", "command(npm test)"]` in settings.json | [cli-features](https://antigravity.google/docs/cli-features) — uid 5_274: exact JSON format |
@@ -242,7 +262,7 @@ Official source: [agents-cli Docs](https://google.github.io/agents-cli/) and [ag
 
 | Count | Category |
 |:---:|:---|
-| 98 | Claims confirmed against official Antigravity CLI documentation |
+| 115 | Claims confirmed against official Antigravity CLI documentation |
 | 3 | Workshop-original pedagogical patterns (`/btw`, "Propose, Review, Apply", "Pre-Commit Review") |
 
 ---
@@ -257,7 +277,6 @@ Official source: [agents-cli Docs](https://google.github.io/agents-cli/) and [ag
 | Features | <https://antigravity.google/docs/cli-features> |
 | Migration from Gemini CLI | <https://antigravity.google/docs/gcli-migration> |
 | Permissions | <https://antigravity.google/docs/permissions> |
-| Strict Mode | <https://antigravity.google/docs/strict-mode> |
 | Plugins | <https://antigravity.google/docs/plugins> |
 | MCP | <https://antigravity.google/docs/mcp> |
 | Skills | <https://antigravity.google/docs/skills> |
@@ -265,3 +284,4 @@ Official source: [agents-cli Docs](https://google.github.io/agents-cli/) and [ag
 | Hooks | <https://antigravity.google/docs/hooks> |
 | Subagents | <https://antigravity.google/docs/subagents> |
 | Enterprise | <https://antigravity.google/docs/enterprise> |
+| Models | <https://antigravity.google/docs/models> |

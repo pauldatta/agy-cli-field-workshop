@@ -141,6 +141,74 @@ else
 fi
 
 # ─────────────────────────────────────────────────────────────
+# 10. Dual-copy exercise parity (docs/exercises/*.md ↔ exercises/*.md)
+# ─────────────────────────────────────────────────────────────
+echo "📋 Checking dual-copy exercise parity..."
+dual_copy_errors=0
+for doc_ex in docs/exercises/ex*.md; do
+  [ -f "$doc_ex" ] || continue
+  ex_base=$(basename "$doc_ex")
+  root_ex="exercises/$ex_base"
+  if [ ! -f "$root_ex" ]; then
+    fail "Exercise '$doc_ex' has no matching copy at '$root_ex'"
+    dual_copy_errors=$((dual_copy_errors + 1))
+  elif ! diff -q "$doc_ex" "$root_ex" > /dev/null 2>&1; then
+    fail "Exercise drift: '$doc_ex' and '$root_ex' differ"
+    dual_copy_errors=$((dual_copy_errors + 1))
+  fi
+done
+if [ "$dual_copy_errors" -eq 0 ]; then
+  pass "All exercises in docs/exercises/ match root exercises/"
+else
+  errors=$((errors + dual_copy_errors))
+fi
+
+# ─────────────────────────────────────────────────────────────
+# 11. SDK API & Runtime Integrity
+# ─────────────────────────────────────────────────────────────
+echo "📋 Checking SDK APIs and types..."
+sdk_errors=0
+if grep -rnE 'tool_result\.success|\.success\b.*ToolResult' docs/ 2>/dev/null; then
+  fail "Detected invalid 'tool_result.success' — use 'tool_result.error is None'"
+  sdk_errors=$((sdk_errors + 1))
+fi
+if grep -rnE 'HookResult\([^)]*message=' docs/ 2>/dev/null; then
+  fail "Detected invalid 'HookResult(message=...)' — HookResult only accepts allow: bool"
+  sdk_errors=$((sdk_errors + 1))
+fi
+if grep -rnE 'WRITE_TOOLS\s*=\s*\{[^}]*write_to_file' docs/ 2>/dev/null; then
+  fail "Detected CLI tool name 'write_to_file' in SDK WRITE_TOOLS — use BuiltinTools.CREATE_FILE"
+  sdk_errors=$((sdk_errors + 1))
+fi
+if [ "$sdk_errors" -eq 0 ]; then
+  pass "SDK APIs, types, and constants compliant"
+else
+  errors=$((errors + sdk_errors))
+fi
+
+# ─────────────────────────────────────────────────────────────
+# 12. CLI state directory paths
+# ─────────────────────────────────────────────────────────────
+echo "📋 Checking CLI state paths..."
+if grep -rnE --exclude-dir="id" --exclude-dir="ko" --exclude-dir="zh" '~/\.gemini/antigravity/' docs/ 2>/dev/null; then
+  fail "Detected legacy '~/.gemini/antigravity/' path in docs/ — use '~/.gemini/antigravity-cli/'"
+  errors=$((errors + 1))
+else
+  pass "All CLI state directory paths use ~/.gemini/antigravity-cli/"
+fi
+
+# ─────────────────────────────────────────────────────────────
+# 13. Keybinding integrity
+# ─────────────────────────────────────────────────────────────
+echo "📋 Checking keybindings..."
+if grep -rnE 'ctrl\+j.*teleport|teleport.*ctrl\+j' docs/ 2>/dev/null; then
+  fail "Detected stale 'ctrl+j' for subagent teleport — must be 'alt+j'"
+  errors=$((errors + 1))
+else
+  pass "Subagent teleport keybinding verified as alt+j"
+fi
+
+# ─────────────────────────────────────────────────────────────
 # Summary
 # ─────────────────────────────────────────────────────────────
 echo ""

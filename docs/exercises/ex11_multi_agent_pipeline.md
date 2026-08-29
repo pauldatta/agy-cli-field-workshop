@@ -81,8 +81,12 @@ Create `writer_agent.py`:
 from google.antigravity import LocalAgentConfig
 from google.antigravity.hooks import policy
 
+# Specify save_dir so trajectory history is persisted across sessions
+SESSION_DIR = ".sessions"
+
 writer_config = LocalAgentConfig(
-    model="gemini-3.5-flash",
+    model="gemini-3.7-flash",
+    save_dir=SESSION_DIR,
     skills_paths=["skills/"],
     system_instructions="""You are a Technical Writer specialising in privacy documentation.
 
@@ -133,7 +137,7 @@ class ComplianceReport(pydantic.BaseModel):
 
 
 analyst_config = LocalAgentConfig(
-    model="gemini-3.5-flash",
+    model="gemini-3.7-flash",
     response_schema=ComplianceReport,
     system_instructions="""You are a GDPR Compliance Analyst.
 
@@ -310,6 +314,7 @@ async def resume_and_refine(writer_conv_id: str, original_report: dict):
     resume_config = writer_config.model_copy(
         update={
             "conversation_id": writer_conv_id,
+            "save_dir": SESSION_DIR,
         }
     )
 

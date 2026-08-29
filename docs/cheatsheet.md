@@ -56,22 +56,39 @@ agy install        # Configure PATH and shell aliases
 
 | Command | Category | Purpose |
 | :-- | :-- | :-- |
-| `/resume` (`/switch`) | Conversation | Open conversation picker to resume or switch sessions |
+| `/resume` (`/switch`, `/conversation`) | Conversation | Open conversation picker to resume or switch sessions |
 | `/rewind` (`/undo`) | Conversation | Roll back conversation history to a previous checkpoint |
-| `/fork` | Conversation | Branch the current conversation into a parallel isolated workspace — trial risky steps without affecting the original |
+| `/fork` (`/branch`) | Conversation | Branch current conversation into an isolated workspace |
 | `/rename <name>` | Conversation | Rename the active conversation thread |
-| `/permissions` | Config | Set autonomy level: `request-review`, `always-proceed`, `strict` |
+| `/clear` (`/new`) | Conversation | Clear active context and start a new conversation |
+| `/permissions` | Config | Set autonomy level: `request-review`, `proceed-in-sandbox`, `always-proceed`, `strict` |
 | `/model` | Config | Select default reasoning model (persists across sessions) |
 | `/config` (`/settings`) | Config | Open full-screen settings overlay |
 | `/keybindings` | Config | Open the interactive keyboard shortcut editor |
 | `/statusline` | Config | Customize real-time CLI status bar indicators |
+| `/fast` | Config | Toggle low-latency fast reasoning mode |
+| `/planning` | Config | Toggle multi-turn plan generation mode |
+| `/teamwork-preview` (`/teamwork`) | Reasoning | Launch collaborative multi-agent teams |
+| `/goal` | Reasoning | Run autonomous goal-directed loop |
+| `/grill-me` | Reasoning | Interactive requirements interview |
+| `/diff` | Utility | Open interactive git diff viewer |
+| `/btw <query>` | Utility | Send background note to steer active agent |
+| `/schedule` | Automation | Schedule background cron or timer tasks |
+| `/browser` | Tools | Launch Chrome DevTools browser automation |
+| `/voice` (`/record`) | Input | Toggle voice prompt dictation |
+| `/context` | Monitoring | View active token usage and context files |
+| `/credits` (`/quota`) | Account | View G1 credit balance and quota status |
 | `/tasks` | Monitoring | Monitor, view logs for, or terminate background tasks |
 | `/skills` | Monitoring | Browse local and global agent skills |
 | `/mcp` | Monitoring | Configure and manage MCP servers |
 | `/agents` | Monitoring | View, manage, and approve subagent actions |
+| `/hooks` | Monitoring | Browse active script and JSON hooks |
 | `/open <path>` | Utility | Open a file in your preferred external editor |
+| `/copy` | Utility | Copy last agent response to system clipboard |
 | `/usage` | Utility | Open the inline interactive help manual |
+| `/help` | Utility | Show all available slash commands and shortcuts |
 | `/logout` | Account | Log out and clear cached credentials |
+| `/exit` (`/quit`) | Account | Exit the CLI session |
 
 ---
 
@@ -83,15 +100,19 @@ agy install        # Configure PATH and shell aliases
 | :-- | :-- |
 | `@` | File path autocomplete (type `@` to trigger path suggestions) |
 | `!` | Run terminal commands directly from the prompt |
-| `esc esc` | Clear your prompt box (when no streaming is active) |
+| `esc esc` | Clear prompt box (when no streaming is active) |
 | `?` | Get help and list all slash commands |
-| `alt+enter` / `shift+enter` | Insert newline without submitting |
-| `ctrl+g` | Edit prompt inside your default shell editor |
+| `alt+enter` / `shift+enter` / `ctrl+j` | Insert newline without submitting (`prompt.newline`) |
+| `ctrl+g` | Edit prompt inside your default shell editor (`$EDITOR`) |
 | `ctrl+l` | Clear TUI screen |
-| `ctrl+d` | Exit the CLI session |
+| `ctrl+d` | Exit the CLI session (or forward delete character) |
 | `ctrl+z` | Suspend CLI to terminal background |
-| `ctrl+j` (in `/agents`) | Teleport to next pending subagent approval |
+| `alt+j` | Teleport to next pending subagent approval (`prompt.teleport_agent`) |
 | `ctrl+k` | Fast-approve pending subagent permission from main conversation |
+| `ctrl+o` | Toggle reasoning trajectory and thought expansion (`prompt.toggle_trajectory`) |
+| `ctrl+r` | Open Artifact Review Panel (`prompt.open_review`) |
+| `ctrl+v` | Paste clipboard block or graphic media file into prompt |
+| `f5` | Toggle voice dictation (`voice.start_dictation`) |
 
 ---
 
@@ -140,7 +161,7 @@ agy plugin link <marketplace> <target>
 #   { "sidecars": { "<name>": { "enabled": true } } }
 
 # Check logs:
-ls ~/.gemini/antigravity/sidecar_data/<name>/logs/
+ls ~/.gemini/antigravity-cli/sidecar_data/<name>/logs/
 
 # agentapi (auto-available inside sidecars):
 agentapi new-conversation "<prompt>"
@@ -168,13 +189,13 @@ Minimal `sidecar.json` — scheduled recurring task:
 
 ```bash
 # Project config directory:
-.agents/                    # settings.json, mcp.json, hooks.json, rules.md, skills/, plugins/
+.agents/                    # settings.json, mcp_config.json, hooks.json, rules.md, skills/, plugins/
 
 # Global config directory:
-~/.gemini/config/           # settings.json, mcp.json, hooks.json, rules.md, skills/, plugins/
+~/.gemini/config/           # settings.json, mcp_config.json, hooks.json, rules.md, skills/, plugins/
 
 # User settings:
-~/.gemini/antigravity/settings.json
+~/.gemini/antigravity-cli/settings.json
 
 # Context file (hierarchical: cwd → parent → home):
 AGENTS.md

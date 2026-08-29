@@ -250,7 +250,7 @@ Selain AGENTS.md, agy juga memuat:
 
 ---
 
-## 1.7 — Perluas dengan Plugin <span class="duration-badge">15 menit</span>
+## 1.7 — Perluas dengan Plugin <span class="duration-badge">15 menit</span> {: #17-extend-with-plugins-15-min }
 
 > **Pola: Bawa Toolchain Anda** — plugin menambahkan skill, server MCP, agen, dan aturan ke agy. Instal sekali, tersedia di setiap sesi.
 
@@ -270,7 +270,7 @@ Menampilkan nama setiap plugin, sumber, tanggal impor, dan komponen (skill, peri
 agy plugin import gemini
 ```
 
-agy memindai instalasi Gemini CLI lokal Anda, menemukan semua plugin yang terinstal, dan menyiapkan komponennya ke dalam `~/.gemini/antigravity/`. Output:
+agy memindai instalasi Gemini CLI lokal Anda, menemukan semua plugin yang terinstal, dan menyiapkan komponennya ke dalam `~/.gemini/antigravity-cli/`. Output:
 
 ```text
   [ok]    code-review
@@ -319,7 +319,7 @@ agy plugin enable gemini-deep-research
 
 | Scope | Path |
 | :-- | :-- |
-| **Global** | `~/.gemini/antigravity/plugins/` |
+| **Global** | `~/.gemini/antigravity-cli/plugins/` |
 | **Project** | `.agents/plugins/` |
 
 ### Building a Custom Plugin

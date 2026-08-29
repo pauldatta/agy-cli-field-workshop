@@ -24,7 +24,7 @@ Use `/model` to switch the active model mid-session — useful when you want hea
 /model
 ```
 
-This opens a model picker showing available options (Gemini 3.5 Flash, Gemini 3.1 Pro, Claude Sonnet 4.6, etc.).
+This opens a model picker showing available options (Gemini 3.7 Flash, Gemini 3.6 Flash, Gemini 3.5 Flash, Gemini 3.1 Pro, Claude Sonnet 4.6, GPT-OSS-120b, etc.).
 
 > 📖 Full model list: [Models docs](https://www.antigravity.google/docs/models)
 
@@ -63,7 +63,7 @@ Key shortcuts from the main conversation:
 
 | Shortcut | Action |
 | :-- | :-- |
-| `Ctrl+J` | Teleport to a subagent pending approval — jump directly to review its request |
+| `Alt+J` | Teleport to a subagent pending approval — jump directly to review its request |
 | `Ctrl+K` | Fast-approve from the main conversation — approve a subagent's pending action without switching |
 
 Subagent lifecycle: **Running → Idle → Killed**
@@ -292,9 +292,11 @@ This is multi-agent incident triage — two parallel investigations, steerable m
 
 ---
 
-## You're Done 🎉
+## Next Steps 🎉
 
-→ **[Cheatsheet](cheatsheet.md)** — every command from all four modules in one place
+→ **[Module 5: Building ADK Agents with agents-cli](agents-cli.md)** — build, evaluate, and deploy ADK agents on Google Cloud
+
+→ **[Cheatsheet](cheatsheet.md)** — every command and shortcut across the workshop
 
 → **[Reference: DevOps Patterns](devops-automation.md)** — `--print` pipelines, CI/CD, sandbox deep dive
 

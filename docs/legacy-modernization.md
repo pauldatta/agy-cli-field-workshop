@@ -181,7 +181,7 @@ Run all three concurrently. I'll review the reports before we start Phase 1.
 The panel shows all running subagents with status: `running`, `done`, `killed`. Watch all three finish simultaneously.
 
 ```text
-ctrl+j
+alt+j
 ```
 
 Teleports you to the next subagent waiting for your approval — useful if one hits a permission boundary and needs a go-ahead.
@@ -200,7 +200,7 @@ Create a read-only security scanner in `.agents/agents/security-scanner.md`:
 
 ```markdown
 ---
-model: gemini-3.1-flash-lite-preview
+model: gemini-3.7-flash
 tools:
   allow:
     - read_file
@@ -241,10 +241,10 @@ Skills are instruction sets the agent reads and activates when relevant. For rep
 ### Create a Migration Skill
 
 ```bash
-mkdir -p ~/.gemini/antigravity/skills/java-migration
+mkdir -p ~/.gemini/antigravity-cli/skills/java-migration
 ```
 
-Create `~/.gemini/antigravity/skills/java-migration/SKILL.md`:
+Create `~/.gemini/antigravity-cli/skills/java-migration/SKILL.md`:
 
 ```markdown
 ---
@@ -446,7 +446,7 @@ agy -p "Scan src/auth/ for javax.persistence.* usage" | \
 #### Track B: Subagent-First (Parallel Analysis → Context → Execute)
 
 1. Spawn three parallel subagents: security scan, dependency map, test coverage
-2. Monitor via `/agents` — use `ctrl+j` and `ctrl+k` for approvals
+2. Monitor via `/agents` — use `alt+j` and `ctrl+k` for approvals
 3. Aggregate their reports into an AGENTS.md (have the agent synthesize)
 4. Install the `java-migration` skill (Section 2.4)
 5. Use `/fork` before the riskiest step — try it there first
@@ -466,7 +466,7 @@ agy -p "Scan src/auth/ for javax.persistence.* usage" | \
 | **AGENTS.md** | Persistent migration standards across sessions | Always — encode constraints |
 | `.agents/rules.md` | Hard system-prompt directives | Non-negotiable guardrails |
 | **Subagents** | Parallel analysis teams | Multi-concern investigations |
-| `/agents` + `ctrl+j` + `ctrl+k` | Monitor and approve subagent work | During parallel runs |
+| `/agents` + `alt+j` + `ctrl+k` | Monitor and approve subagent work | During parallel runs |
 | **Hooks** (PreToolUse) | Block writes outside migration scope | Automated guardrails |
 | **Hooks** (PostToolUse) | Auto-run tests after every change | Test gate automation |
 | `/rewind` | Roll back conversation if agent drifts | Mid-session course correction |

@@ -200,7 +200,7 @@ ctrl+k
 
 ```markdown
 ---
-model: gemini-3.1-flash-lite-preview
+model: gemini-3.7-flash
 tools:
   allow:
     - read_file
@@ -241,10 +241,10 @@ Never modify any file. Never execute any command.
 ### 마이그레이션 스킬 생성
 
 ```bash
-mkdir -p ~/.gemini/antigravity/skills/java-migration
+mkdir -p ~/.gemini/antigravity-cli/skills/java-migration
 ```
 
-`~/.gemini/antigravity/skills/java-migration/SKILL.md` 생성:
+`~/.gemini/antigravity-cli/skills/java-migration/SKILL.md` 생성:
 
 ```markdown
 ---

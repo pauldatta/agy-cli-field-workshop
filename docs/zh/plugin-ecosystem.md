@@ -34,7 +34,7 @@ agy plugin list | python3 -m json.tool
 agy plugin import gemini
 ```
 
-agy 会扫描你本地的 Gemini CLI 安装，发现所有已安装的插件，并将它们的组件（技能、命令、MCP 服务器、代理）暂存到位于 `~/.gemini/antigravity/` 的 agy 配置中。
+agy 会扫描你本地的 Gemini CLI 安装，发现所有已安装的插件，并将它们的组件（技能、命令、MCP 服务器、代理）暂存到位于 `~/.gemini/antigravity-cli/` 的 agy 配置中。
 
 输出如下所示：
 
@@ -193,7 +193,7 @@ agy plugin validate samples/plugins/workshop-helpers/
 
 ```mermaid
 graph LR
-    GC["Gemini CLI\n插件"] --> |agy plugin import gemini| S["插件暂存\n~/.gemini/antigravity/plugins/"]
+    GC["Gemini CLI\n插件"] --> |agy plugin import gemini| S["插件暂存\n~/.gemini/antigravity-cli/plugins/"]
     CC["Claude Code\n扩展"] --> |agy plugin import claude| S
     S --> |agy plugin enable/disable| A[agy 会话]
     A --> SK[技能]
@@ -207,7 +207,7 @@ graph LR
 Plugin staging directory structure:
 
 ```text
-~/.gemini/antigravity/plugins/<name>/
+~/.gemini/antigravity-cli/plugins/<name>/
 ├── plugin.json
 ├── mcp_config.json
 ├── hooks.json
@@ -328,7 +328,7 @@ agentapi send-message <conversation_id> "<prompt>"
 Sidecar output is stored at:
 
 ```text
-~/.gemini/antigravity/sidecar_data/<sidecarId>/
+~/.gemini/antigravity-cli/sidecar_data/<sidecarId>/
 ├── data/     ← 持久化存储（ANTIGRAVITY_EXECUTABLE_DATA_DIR 环境变量）
 ├── logs/     ← 带时间戳的 stdout/stderr 日志
 └── events/   ← agentapi 调用的 JSON 记录
@@ -373,7 +373,7 @@ Sidecar output is stored at:
 2. 将 cron 设置为 `0 9 * * 1-5`（周一至周五上午 9 点）
 3. 使用 `agentapi new-conversation` 打开一个带有你的站会提示词的对话
 4. 在 `~/.gemini/config/config.json` 中启用它
-5. 验证它是否出现在 `~/.gemini/antigravity/sidecar_data/standup/logs/` 的日志中
+5. 验证它是否出现在 `~/.gemini/antigravity-cli/sidecar_data/standup/logs/` 的日志中
 
 **延伸目标：** 使用 `command: python3` 添加第二个 Sidecar，它会监视本地文件的更改，并在检测到差异时向现有对话发送消息。
 

@@ -124,7 +124,7 @@ from google.antigravity import Agent, LocalAgentConfig
 from google.antigravity.hooks import policy
 
 config = LocalAgentConfig(
-    model="gemini-3.5-flash",
+    model="gemini-3.7-flash",
     system_instructions="""You are a code reviewer specialising in Python.
 When given a file path, read the file and provide a structured review covering:
 - Correctness and edge cases
@@ -156,10 +156,12 @@ Match the model to the job. Cost-conscious policy:
 
 | Role | Model | Rationale |
 | :-- | :-- | :-- |
-| General tasks, code review | `gemini-3.5-flash` | SDK default — cost-efficient, fast |
+| General tasks, code review | `gemini-3.7-flash` | SDK default — high efficiency and coding performance |
+| High-throughput baseline | `gemini-3.5-flash` / `gemini-3.6-flash` | Fast, cost-efficient execution |
 | Orchestration, routing, planning | `gemini-3.1-pro-preview` | Complex reasoning, multi-step decisions |
-| Image generation tasks | `gemini-3.1-flash-image-preview` | SDK default for image generation |
-| High-stakes analysis | `gemini-3.1-pro-preview` with `ThinkingLevel.HIGH` | Deep reasoning for compliance/security |
+| Image generation tasks | `gemini-3.1-flash-lite-image` | SDK default for image generation (Nano Banana 2) |
+| High-stakes analysis | `gemini-3.1-pro-preview` with `ThinkingLevel.HIGH` | Deep reasoning for compliance and security |
+| Enterprise alternative models | `claude-sonnet-4-6`, `claude-opus-4-6`, `gpt-oss-120b` | Multi-provider support on Vertex AI / enterprise |
 
 > **Never use** `gemini-1.5-flash`, `gemini-1.5-pro`. Deprecated.
 
@@ -247,13 +249,14 @@ async def security_guard(tool_call: ToolCall) -> HookResult:
     if tool_call.name == "run_command":
         cmd = tool_call.args.get("CommandLine", "")
         if any(danger in cmd for danger in ["rm -rf", "drop table", "DELETE FROM"]):
-            return HookResult(allow=False, message=f"Blocked dangerous command: {cmd}")
+            return HookResult(allow=False)
     return HookResult(allow=True)
 
 # Log all tool completions (non-blocking, read-only)
 @hooks.post_tool_call
 async def audit_logger(tool_result: ToolResult) -> None:
-    print(f"[AUDIT] tool={tool_result.name} success={tool_result.success}")
+    is_success = tool_result.error is None
+    print(f"[AUDIT] tool={tool_result.name} success={is_success}")
 
 # Initialise state when a session begins
 @hooks.on_session_start
@@ -263,7 +266,7 @@ async def initialise_state() -> None:
 config = LocalAgentConfig(
     hooks=[security_guard, audit_logger, initialise_state],
     policies=[policy.allow_all()],
-    model="gemini-3.5-flash",
+    model="gemini-3.7-flash",
     system_instructions="You are a code reviewer.",
     tools=[get_file_contents],
 )
@@ -391,7 +394,7 @@ config = LocalAgentConfig(
     response_schema=ReviewResult,
     system_instructions="Analyse the code and return structured output via the finish tool.",
     policies=[policy.allow_all()],
-    model="gemini-3.5-flash",
+    model="gemini-3.7-flash",
     tools=[get_file_contents],
 )
 
@@ -409,16 +412,23 @@ asyncio.run(main())
 ## 3.7 — Session Resume and Persistence <span class="duration-badge">5 min</span>
 
 ```python
-# First session — save the conversation ID
-async with Agent(config) as agent:
-    await agent.chat("Analyse this codebase and build a mental model.")
-    conv_id = agent.conversation_id   # persist this
+save_dir = "/path/to/session_storage"
 
-# Later session — resume exactly where you left off
+# First session — specify save_dir to persist trajectory
+init_config = LocalAgentConfig(
+    save_dir=save_dir,
+    model="gemini-3.7-flash",
+    policies=[policy.allow_all()],
+)
+async with Agent(init_config) as agent:
+    await agent.chat("Analyse this codebase and build a mental model.")
+    conv_id = agent.conversation_id   # persist this ID
+
+# Later session — resume using the same save_dir and conversation_id
 resume_config = LocalAgentConfig(
     conversation_id=conv_id,
-    save_dir="/path/where/first/session/was/saved",
-    model="gemini-3.5-flash",
+    save_dir=save_dir,
+    model="gemini-3.7-flash",
     policies=[policy.allow_all()],
 )
 async with Agent(resume_config) as agent:

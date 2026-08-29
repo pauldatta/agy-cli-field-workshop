@@ -4,7 +4,7 @@
 > Use this before writing, editing, or reviewing any workshop content.
 > Do NOT invent commands or flags — if it's not in this doc, fetch the source first.
 >
-> **Last verified:** 2026-05-25 via Chrome DevTools MCP (rendered SPA) + `agy --help` live binary
+> **Last verified:** 2026-08-29 via Chrome DevTools MCP (rendered SPA) + `agy --help` live binary
 > **Maintainer:** Update this doc whenever you verify a new claim against official sources.
 > Add the source URL + uid node reference with every new entry.
 
@@ -123,34 +123,39 @@ Official source: [cli-features — Core Slash Commands](https://antigravity.goog
 
 | Command | Description | Source |
 |:--|:--|:--|
-| `/resume` (alias `/switch`) | Open session picker — list and resume previous conversations | cli-features uid 5_213–5_219 |
+| `/resume` (aliases `/switch`, `/conversation`) | Open session picker — list and resume previous conversations | cli-features uid 5_213–5_219 |
 | `/rewind` (alias `/undo`) | Roll back conversation history to a previous turn | cli-features uid 5_220–5_226 |
 | `/rename <name>` | Rename the active conversation thread | cli-features uid 5_227–5_229 |
-| `/permissions` | View/set autonomy level: `request-review`, `always-proceed`, `strict` | cli-features uid 5_230–5_238 |
+| `/permissions` | View/set autonomy level: `request-review`, `proceed-in-sandbox`, `always-proceed`, `strict` | cli-features uid 5_230–5_238 |
 | `/model` | Select default reasoning model — persists across sessions | cli-features uid 5_239–5_241 |
 | `/keybindings` | Open keyboard shortcut editor | cli-features uid 5_242–5_244 |
 | `/statusline` | Customize the CLI status bar | cli-features uid 5_245–5_247 |
+| `/fast` | Toggle fast reasoning mode | cli-features reference |
+| `/planning` | Toggle multi-turn plan generation mode | cli-features reference |
+| `/teamwork-preview` (alias `/teamwork`) | Launch collaborative multi-agent teams | cli-features reference |
+| `/goal` | Autonomous goal-directed loop | cli-features reference |
+| `/grill-me` | Interactive requirements interview | cli-features reference |
+| `/diff` | Open interactive git diff viewer | cli-features reference |
+| `/btw <query>` | Send background note to steer active agent | cli-features reference |
+| `/schedule` | Schedule background cron or timer tasks | cli-features reference |
+| `/browser` | Launch Chrome DevTools browser automation | cli-features reference |
+| `/voice` (alias `/record`) | Toggle voice prompt dictation | cli-features reference |
+| `/context` | View active context token usage and files | cli-features reference |
+| `/credits` (alias `/quota`) | View G1 credit balance and quota status | cli-features reference |
 | `/tasks` | Monitor and terminate background tasks | cli-features uid 5_248–5_250 |
 | `/skills` | Browse available agent skills | cli-features uid 5_251–5_253 |
 | `/mcp` | Manage MCP servers | cli-features uid 5_254–5_256 |
+| `/hooks` | Browse active script and JSON hooks | cli-features reference |
 | `/open <path>` | Open a file in the external editor | cli-features uid 5_257–5_259 |
+| `/copy` | Copy last agent response to clipboard | cli-features reference |
 | `/usage` | Inline interactive help manual | cli-features uid 5_260–5_262 |
+| `/help` | Show all available slash commands and shortcuts | cli-features reference |
 | `/logout` | Log out and clear cached credentials | cli-features uid 5_263–5_265 |
+| `/exit` (alias `/quit`) | Exit the CLI session | cli-features reference |
 | `/agents` | Open the subagents panel | cli-features uid 5_289–5_295 |
 | `/config` or `/settings` | Open full-screen settings overlay | cli-using uid 3_166–3_169 |
-| `/clear` | Clear prompt and start new session *(quick tips only — not in the main slash command table)* | cli-using uid 3_225 |
-| `/fork` | Spin up a separate parallel workspace *(quick tips only)* | cli-using uid 3_221 |
-
-### ❌ Slash commands that do NOT exist
-
-| Command | Status |
-|:--|:--|
-| `/browser` | Not in any official doc |
-| `/compact` | Not in any official doc |
-| `/plan` | Not in any official doc — "Plan Mode" concept maps to `/permissions strict` |
-| `/stats` | Not in any official doc |
-| `/memory` | Not in any official doc |
-| `/security:analyze` | Not in any official doc — was from an unofficial extension |
+| `/clear` (alias `/new`) | Clear prompt and start new session | cli-using uid 3_225 |
+| `/fork` (alias `/branch`) | Spin up a separate parallel workspace | cli-using uid 3_221 |
 
 ---
 
@@ -180,13 +185,17 @@ Source: [cli-using — Keybindings](https://antigravity.google/docs/cli-using) u
 
 | Shortcut | Action |
 |:--|:--|
-| `alt+enter` | Insert newline (also: `ctrl+j`, `shift+enter`) |
+| `alt+enter` / `shift+enter` / `ctrl+j` | Insert newline without submitting (`prompt.newline`) |
 | `ctrl+g` | Open current prompt in `$EDITOR` (external editor) |
 | `ctrl+l` | Clear TUI screen |
-| `ctrl+d` | Exit the CLI |
+| `ctrl+d` | Exit the CLI (or forward delete character) |
 | `ctrl+z` | Suspend CLI to background |
-| `ctrl+j` | In `/agents` panel: teleport to next pending subagent approval |
+| `alt+j` | Teleport to next pending subagent approval (`prompt.teleport_agent`) |
 | `ctrl+k` | Fast-approve a pending subagent permission from main conversation |
+| `ctrl+o` | Toggle reasoning trajectory expansion (`prompt.toggle_trajectory`) |
+| `ctrl+r` | Open Artifact Review Panel (`prompt.open_review`) |
+| `ctrl+v` | Paste graphic media or clipboard block into prompt |
+| `f5` | Toggle voice dictation (`voice.start_dictation`) |
 
 > **Casing:** Official docs use lowercase consistently (`alt+enter`, not `Alt+Enter`).
 > Source: cli-using uid 3_324–3_332 (all three insert-newline combos)

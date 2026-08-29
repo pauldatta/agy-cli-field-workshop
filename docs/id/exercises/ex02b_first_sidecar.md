@@ -89,7 +89,7 @@ Di dalam sesi, tanyakan:
 Periksa direktori data runtime sidecar:
 
 ```bash
-ls -la ~/.gemini/antigravity/sidecar_data/standup/logs/
+ls -la ~/.gemini/antigravity-cli/sidecar_data/standup/logs/
 ```
 
 Jika direktori tersebut ada, sidecar telah terdaftar. Berkas log akan muncul di sini dengan keluaran stdout/stderr yang diberi stempel waktu setelah setiap eksekusi yang dijadwalkan.
@@ -104,13 +104,13 @@ Periksa struktur data sidecar secara lengkap:
 
 ```bash
 # The sidecar runtime directory layout
-find ~/.gemini/antigravity/sidecar_data/standup/ -type f 2>/dev/null
+find ~/.gemini/antigravity-cli/sidecar_data/standup/ -type f 2>/dev/null
 ```
 
 Struktur yang diharapkan:
 
 ```text
-~/.gemini/antigravity/sidecar_data/standup/
+~/.gemini/antigravity-cli/sidecar_data/standup/
 ├── data/     ← persistent storage (ANTIGRAVITY_EXECUTABLE_DATA_DIR env var)
 ├── logs/     ← timestamped stdout/stderr logs
 └── events/   ← JSON records of agentapi calls
@@ -196,5 +196,5 @@ Aktifkan di `~/.gemini/config/config.json`:
 - [ ] `~/.gemini/config/sidecars/standup/sidecar.json` ada dengan bawaan `schedule` dan cron `0 9 * * 1-5`
 - [ ] `~/.gemini/config/config.json` memiliki `sidecars.standup.enabled: true`
 - [ ] AGY mengenali sidecar tersebut (dikonfirmasi melalui kueri sesi atau keberadaan direktori log)
-- [ ] Direktori runtime sidecar ada di `~/.gemini/antigravity/sidecar_data/standup/`
+- [ ] Direktori runtime sidecar ada di `~/.gemini/antigravity-cli/sidecar_data/standup/`
 - [ ] *(Tantangan)* Sidecar pengamat berkas dibuat dengan `command: python3` dan `watch.py` yang berfungsi

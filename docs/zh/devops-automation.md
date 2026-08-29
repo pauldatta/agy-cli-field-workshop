@@ -173,7 +173,7 @@ git diff --cached | agy --dangerously-skip-permissions \
 
 ### 启用沙盒
 
-沙盒通过 `settings.json`（项目级别的 `.agents/settings.json` 或用户级别的 `~/.gemini/antigravity/settings.json`）进行配置：
+沙盒通过 `settings.json`（项目级别的 `.agents/settings.json` 或用户级别的 `~/.gemini/antigravity-cli/settings.json`）进行配置：
 
 ```json
 {

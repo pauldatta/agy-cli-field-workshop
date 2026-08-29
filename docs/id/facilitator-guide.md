@@ -110,7 +110,7 @@ Ini adalah **workshop praktik langsung dengan 5 modul, ~7 jam** untuk Antigravit
 | "Bisakah saya menggunakan kunci API saya sendiri?" | agy menggunakan Google Sign-In berbasis peramban. Pengguna enterprise menghubungkan proyek GCP. Lihat [Dokumentasi enterprise](https://www.antigravity.google/docs/enterprise). |
 | "Apakah kode dikirim ke Google?" | Lihat [FAQ](https://www.antigravity.google/docs/faq) untuk detail penanganan data. |
 | "Bagaimana dengan hook?" | agy-cli mendukung hook melalui `hooks.json`. Lihat [Dokumentasi hook](https://www.antigravity.google/docs/hooks). |
-| "Di mana log percakapan disimpan?" | `~/.gemini/antigravity/conversations/` |
+| "Di mana log percakapan disimpan?" | `~/.gemini/antigravity-cli/conversations/` |
 | "Tema Gemini CLI saya tidak terimpor." | Sudah diduga — tema kustom diabaikan secara diam-diam selama `agy plugin import gemini`. Skill, server MCP, dan agen tetap terbawa. |
 | "Bisakah saya men-deploy agen SDK ke Cloud Run?" | Ya — `adk deploy cloud_run`. Lihat Modul 3 bagian 3.6. |
 
@@ -122,7 +122,7 @@ Ini adalah **workshop praktik langsung dengan 5 modul, ~7 jam** untuk Antigravit
 | :-- | :-- |
 | `agy: command not found` | Periksa PATH. Jalankan `which agy` atau `which agy-cli`. |
 | Kesalahan Autentikasi / 401 | Kredensial sesi mungkin telah kedaluwarsa. Distribusikan ulang autentikasi. |
-| Kesalahan `agy plugin list` | Periksa apakah `~/.gemini/antigravity/` ada |
+| Kesalahan `agy plugin list` | Periksa apakah `~/.gemini/antigravity-cli/` ada |
 | Respons lambat | Periksa jaringan. Proses pertama setelah diam mungkin lebih lambat karena pengindeksan ruang kerja. |
 | Sub-agen tidak muncul | Pastikan peserta berada dalam mode interaktif (bukan `--print`) |
 | Kesalahan impor `google-adk` (M3) | Pastikan venv diaktifkan: `source .venv/bin/activate` |

@@ -89,7 +89,7 @@ agy
 检查 Sidecar 的运行时数据目录：
 
 ```bash
-ls -la ~/.gemini/antigravity/sidecar_data/standup/logs/
+ls -la ~/.gemini/antigravity-cli/sidecar_data/standup/logs/
 ```
 
 如果该目录存在，则说明 Sidecar 已注册。每次计划运行后，带有时间戳的 stdout/stderr 输出日志文件将出现在这里。
@@ -104,13 +104,13 @@ ls -la ~/.gemini/antigravity/sidecar_data/standup/logs/
 
 ```bash
 # The sidecar runtime directory layout
-find ~/.gemini/antigravity/sidecar_data/standup/ -type f 2>/dev/null
+find ~/.gemini/antigravity-cli/sidecar_data/standup/ -type f 2>/dev/null
 ```
 
 预期结构：
 
 ```text
-~/.gemini/antigravity/sidecar_data/standup/
+~/.gemini/antigravity-cli/sidecar_data/standup/
 ├── data/     ← persistent storage (ANTIGRAVITY_EXECUTABLE_DATA_DIR env var)
 ├── logs/     ← timestamped stdout/stderr logs
 └── events/   ← JSON records of agentapi calls
@@ -196,5 +196,5 @@ if __name__ == "__main__":
 - [ ] `~/.gemini/config/sidecars/standup/sidecar.json` 存在，包含 `schedule` 内置功能和 `0 9 * * 1-5` cron 表达式
 - [ ] `~/.gemini/config/config.json` 包含 `sidecars.standup.enabled: true`
 - [ ] AGY 能够识别该 Sidecar（通过会话查询或日志目录的存在来确认）
-- [ ] Sidecar 运行时目录存在于 `~/.gemini/antigravity/sidecar_data/standup/`
+- [ ] Sidecar 运行时目录存在于 `~/.gemini/antigravity-cli/sidecar_data/standup/`
 - [ ] *(扩展目标)* 创建了文件监听 Sidecar，使用 `command: python3` 和一个可运行的 `watch.py`

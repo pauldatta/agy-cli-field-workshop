@@ -173,7 +173,7 @@ git diff --cached | agy --dangerously-skip-permissions \
 
 ### 샌드박스 활성화
 
-샌드박스는 `settings.json`(프로젝트의 `.agents/settings.json` 또는 사용자의 `~/.gemini/antigravity/settings.json`)을 통해 구성됩니다:
+샌드박스는 `settings.json`(프로젝트의 `.agents/settings.json` 또는 사용자의 `~/.gemini/antigravity-cli/settings.json`)을 통해 구성됩니다:
 
 ```json
 {

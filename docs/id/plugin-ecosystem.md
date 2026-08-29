@@ -34,7 +34,7 @@ agy plugin list | python3 -m json.tool
 agy plugin import gemini
 ```
 
-agy memindai instalasi Gemini CLI lokal Anda, menemukan semua plugin yang terinstal, dan menempatkan komponennya (skill, perintah, server MCP, agen) ke dalam konfigurasi agy di `~/.gemini/antigravity/`.
+agy memindai instalasi Gemini CLI lokal Anda, menemukan semua plugin yang terinstal, dan menempatkan komponennya (skill, perintah, server MCP, agen) ke dalam konfigurasi agy di `~/.gemini/antigravity-cli/`.
 
 Outputnya terlihat seperti:
 
@@ -193,7 +193,7 @@ agy plugin validate samples/plugins/workshop-helpers/
 
 ```mermaid
 graph LR
-    GC["Gemini CLI\nPlugins"] --> |agy plugin import gemini| S["Plugin Staging\n~/.gemini/antigravity/plugins/"]
+    GC["Gemini CLI\nPlugins"] --> |agy plugin import gemini| S["Plugin Staging\n~/.gemini/antigravity-cli/plugins/"]
     CC["Claude Code\nExtensions"] --> |agy plugin import claude| S
     S --> |agy plugin enable/disable| A[agy session]
     A --> SK[Skills]
@@ -207,7 +207,7 @@ graph LR
 Plugin staging directory structure:
 
 ```text
-~/.gemini/antigravity/plugins/<name>/
+~/.gemini/antigravity-cli/plugins/<name>/
 ├── plugin.json
 ├── mcp_config.json
 ├── hooks.json
@@ -328,7 +328,7 @@ agentapi send-message <conversation_id> "<prompt>"
 Sidecar output is stored at:
 
 ```text
-~/.gemini/antigravity/sidecar_data/<sidecarId>/
+~/.gemini/antigravity-cli/sidecar_data/<sidecarId>/
 ├── data/     ← persistent storage (ANTIGRAVITY_EXECUTABLE_DATA_DIR env var)
 ├── logs/     ← timestamped stdout/stderr logs
 └── events/   ← JSON records of agentapi calls
@@ -373,7 +373,7 @@ Sidecar output is stored at:
 2. Atur cron ke `0 9 * * 1-5` (9 pagi Senin–Jumat)
 3. Gunakan `agentapi new-conversation` untuk membuka percakapan dengan prompt standup Anda
 4. Aktifkan di `~/.gemini/config/config.json`
-5. Verifikasi bahwa itu muncul di log pada `~/.gemini/antigravity/sidecar_data/standup/logs/`
+5. Verifikasi bahwa itu muncul di log pada `~/.gemini/antigravity-cli/sidecar_data/standup/logs/`
 
 **Tujuan tambahan:** Tambahkan sidecar kedua menggunakan `command: python3` yang memantau perubahan pada berkas lokal dan mengirimkan pesan ke percakapan yang ada ketika mendeteksi adanya diff.
 

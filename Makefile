@@ -283,8 +283,8 @@ setup-hooks:  ## Install git pre-commit hook
 
 P ?= 6
 FP ?= 3
-AGY_TRANSLATE_SCRIPT := ../gemini-cli-field-workshop/tools/i18n/translate.py
-AGY_VENV_PYTHON := ../gemini-cli-field-workshop/.venv/bin/python
+AGY_TRANSLATE_SCRIPT := tools/i18n/translate.py
+UV_BIN := /usr/local/google/home/pauldatta/.local/bin/uv
 AGY_TRANSLATE_ENV := GOOGLE_CLOUD_PROJECT=$${GOOGLE_CLOUD_PROJECT} GOOGLE_CLOUD_LOCATION=global AGY_REPO_ROOT=$(PWD)
 
 translate-list:  ## Show available languages and translation status
@@ -333,35 +333,27 @@ check-translations:  ## Report translation drift and missing files (advisory, no
 	@echo "ℹ️  This check is advisory — translations are not required to commit."
 
 _check-translate-env:
-	@if [ -z "$${GOOGLE_CLOUD_PROJECT:-}" ]; then \
-		echo "❌ Set GOOGLE_CLOUD_PROJECT first (e.g. export GOOGLE_CLOUD_PROJECT=<your-gcp-project>)"; \
+	@if [ -z "$${GOOGLE_CLOUD_PROJECT:-}" ] && [ -z "$${GEMINI_API_KEY:-}" ]; then \
+		echo "❌ Set GOOGLE_CLOUD_PROJECT or GEMINI_API_KEY first (e.g. export GOOGLE_CLOUD_PROJECT=<your-gcp-project>)"; \
 		exit 1; \
 	fi
 	@if [ -z "$(L)" ]; then echo "❌ Specify L=ko|zh|id" && exit 1; fi
-	@if [ ! -f "$(AGY_VENV_PYTHON)" ]; then \
-		echo "❌ Translation venv not found at $(AGY_VENV_PYTHON)"; \
-		echo "   Run: cd ../gemini-cli-field-workshop && uv pip install google-genai --index-url https://pypi.org/simple/"; \
-		exit 1; \
-	fi
 
 translate: _check-translate-env  ## Translate all docs to target language (L=ko|zh|id)
-	$(AGY_TRANSLATE_ENV) $(AGY_VENV_PYTHON) $(AGY_TRANSLATE_SCRIPT) \
-		--all --lang $(L) --parallel $(P) --file-parallel $(FP) --model gemini-3.1-pro-preview
+	$(AGY_TRANSLATE_ENV) $(UV_BIN) run $(AGY_TRANSLATE_SCRIPT) \
+		--all --lang $(L) --parallel $(P) --file-parallel $(FP) --model gemini-3.7-flash
 
 translate-file: _check-translate-env  ## Translate one file (FILE=docs/setup.md L=ko)
 	@test -n "$(FILE)" || (echo "❌ Specify FILE=docs/setup.md" && exit 1)
-	$(AGY_TRANSLATE_ENV) $(AGY_VENV_PYTHON) $(AGY_TRANSLATE_SCRIPT) \
-		$(FILE) --lang $(L) --parallel $(P) --model gemini-3.1-pro-preview
+	$(AGY_TRANSLATE_ENV) $(UV_BIN) run $(AGY_TRANSLATE_SCRIPT) \
+		$(FILE) --lang $(L) --parallel $(P) --model gemini-3.7-flash
 
 translate-all:  ## Translate all docs to ALL languages in parallel (ko, zh, id)
-	@if [ -z "$${GOOGLE_CLOUD_PROJECT:-}" ]; then \
-		echo "❌ Set GOOGLE_CLOUD_PROJECT first"; exit 1; \
+	@if [ -z "$${GOOGLE_CLOUD_PROJECT:-}" ] && [ -z "$${GEMINI_API_KEY:-}" ]; then \
+		echo "❌ Set GOOGLE_CLOUD_PROJECT or GEMINI_API_KEY first"; exit 1; \
 	fi
-	@if [ ! -f "$(AGY_VENV_PYTHON)" ]; then \
-		echo "❌ Translation venv not found at $(AGY_VENV_PYTHON)"; exit 1; \
-	fi
-	$(AGY_TRANSLATE_ENV) $(AGY_VENV_PYTHON) $(AGY_TRANSLATE_SCRIPT) \
-		--all --langs ko,zh,id --parallel $(P) --file-parallel $(FP) --model gemini-3.1-pro-preview
+	$(AGY_TRANSLATE_ENV) $(UV_BIN) run $(AGY_TRANSLATE_SCRIPT) \
+		--all --langs ko,zh,id --parallel $(P) --file-parallel $(FP) --model gemini-3.7-flash
 	@echo ""
 	@echo "  Post-translating all languages..."
 	@for lang in ko zh id; do \

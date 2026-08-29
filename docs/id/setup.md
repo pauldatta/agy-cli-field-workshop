@@ -130,7 +130,7 @@ Daftar periksa sebelum lokakarya dimulai:
 | Kesalahan autentikasi / browser tidak terbuka | Untuk sesi SSH, salin URL yang dicetak secara manual. Untuk lokal, periksa pengaturan browser bawaan. Jalankan `/logout` dan coba lagi |
 | `agy plugin list` mengembalikan `No imported plugins.` | Diharapkan pada instalasi baru (bukan JSON). Anda akan mengisi plugin pada Modul 2 |
 | Respons pertama lambat | Proses pertama mungkin lebih lambat karena agy mengindeks ruang kerja Anda |
-| Konfigurasi tidak dimuat | Periksa `~/.gemini/antigravity/settings.json` (pengaturan pengguna) dan `.agents/` (pengaturan proyek) |
+| Konfigurasi tidak dimuat | Periksa `~/.gemini/antigravity-cli/settings.json` (pengaturan pengguna) dan `.agents/` (pengaturan proyek) |
 
 ---
 

@@ -91,7 +91,7 @@ cd agy-cli-field-workshop
 agy --print "List the files in the current directory."
 ```
 
-You'll see a `.agents/` folder created with project config files (settings.json, mcp.json, etc.).
+You'll see a `.agents/` folder created with project config files (settings.json, mcp_config.json, etc.).
 
 !!! info ".gemini/ compatibility"
     agy also reads `.gemini/` directories — useful if you already have a Gemini CLI project setup. Both config locations are respected.
@@ -130,7 +130,7 @@ Checklist before the workshop starts:
 | Auth errors / browser doesn't open | For SSH sessions, copy the printed URL manually. For local, check default browser settings. Run `/logout` and retry |
 | `agy plugin list` returns `No imported plugins.` | Expected on a fresh install (not JSON). You'll populate plugins in Module 2 |
 | Slow first response | First run may be slower as agy indexes your workspace |
-| Config not loading | Check `~/.gemini/antigravity/settings.json` (user settings) and `.agents/` (project settings) |
+| Config not loading | Check `~/.gemini/antigravity-cli/settings.json` (user settings) and `.agents/` (project settings) |
 
 ---
 

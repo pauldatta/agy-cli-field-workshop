@@ -140,7 +140,7 @@ agy plugin link <marketplace> <target>
 #   { "sidecars": { "<name>": { "enabled": true } } }
 
 # Check logs:
-ls ~/.gemini/antigravity/sidecar_data/<name>/logs/
+ls ~/.gemini/antigravity-cli/sidecar_data/<name>/logs/
 
 # agentapi (auto-available inside sidecars):
 agentapi new-conversation "<prompt>"
@@ -174,7 +174,7 @@ Minimal `sidecar.json` — tugas berulang terjadwal:
 ~/.gemini/config/           # settings.json, mcp.json, hooks.json, rules.md, skills/, plugins/
 
 # User settings:
-~/.gemini/antigravity/settings.json
+~/.gemini/antigravity-cli/settings.json
 
 # Context file (hierarchical: cwd → parent → home):
 AGENTS.md

@@ -244,13 +244,13 @@ async def security_guard(tool_call: ToolCall) -> HookResult:
     if tool_call.name == "run_command":
         cmd = tool_call.args.get("CommandLine", "")
         if any(danger in cmd for danger in ["rm -rf", "drop table", "DELETE FROM"]):
-            return HookResult(allow=False, message=f"Blocked dangerous command: {cmd}")
+            return HookResult(allow=False)
     return HookResult(allow=True)
 
 # Log all tool completions (non-blocking, read-only)
 @hooks.post_tool_call
 async def audit_logger(tool_result: ToolResult) -> None:
-    print(f"[AUDIT] tool={tool_result.name} success={tool_result.success}")
+    print(f"[AUDIT] tool={tool_result.name} ok={tool_result.error is None}")
 
 # Initialise state when a session begins
 @hooks.on_session_start

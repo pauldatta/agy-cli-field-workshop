@@ -200,7 +200,7 @@ Buat pemindai keamanan read-only di `.agents/agents/security-scanner.md`:
 
 ```markdown
 ---
-model: gemini-3.1-flash-lite-preview
+model: gemini-3.7-flash
 tools:
   allow:
     - read_file
@@ -241,10 +241,10 @@ Skill adalah kumpulan instruksi yang dibaca dan diaktifkan oleh agen saat releva
 ### Buat Skill Migrasi
 
 ```bash
-mkdir -p ~/.gemini/antigravity/skills/java-migration
+mkdir -p ~/.gemini/antigravity-cli/skills/java-migration
 ```
 
-Buat `~/.gemini/antigravity/skills/java-migration/SKILL.md`:
+Buat `~/.gemini/antigravity-cli/skills/java-migration/SKILL.md`:
 
 ```markdown
 ---

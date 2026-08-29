@@ -110,7 +110,7 @@
 | "내 API 키를 사용할 수 있나요?" | agy는 브라우저 기반 Google 로그인을 사용합니다. 엔터프라이즈 사용자는 GCP 프로젝트를 연결합니다. [엔터프라이즈 문서](https://www.antigravity.google/docs/enterprise)를 참조하세요. |
 | "코드가 Google로 전송되나요?" | 데이터 처리 세부 정보는 [FAQ](https://www.antigravity.google/docs/faq)를 참조하세요. |
 | "훅은 어떻게 되나요?" | agy-cli는 `hooks.json`을 통해 훅을 지원합니다. [훅 문서](https://www.antigravity.google/docs/hooks)를 참조하세요. |
-| "대화 로그는 어디에 저장되나요?" | `~/.gemini/antigravity/conversations/` |
+| "대화 로그는 어디에 저장되나요?" | `~/.gemini/antigravity-cli/conversations/` |
 | "내 Gemini CLI 테마가 가져오기 되지 않았습니다." | 정상적인 동작입니다. 사용자 지정 테마는 `agy plugin import gemini` 중에 조용히 삭제됩니다. 스킬, MCP 서버 및 에이전트는 정상적으로 이관됩니다. |
 | "SDK 에이전트를 Cloud Run에 배포할 수 있나요?" | 네, `adk deploy cloud_run`을 사용하면 됩니다. 모듈 3의 섹션 3.6을 참조하세요. |
 
@@ -122,7 +122,7 @@
 | :-- | :-- |
 | `agy: command not found` | PATH를 확인하세요. `which agy` 또는 `which agy-cli`를 실행하세요. |
 | 인증 오류 / 401 | 세션 자격 증명이 만료되었을 수 있습니다. 인증을 다시 배포하세요. |
-| `agy plugin list` 오류 | `~/.gemini/antigravity/`가 존재하는지 확인하세요. |
+| `agy plugin list` 오류 | `~/.gemini/antigravity-cli/`가 존재하는지 확인하세요. |
 | 느린 응답 | 네트워크를 확인하세요. 유휴 상태 후 첫 실행은 작업 공간 인덱싱으로 인해 더 느릴 수 있습니다. |
 | 서브에이전트가 생성되지 않음 | 참가자가 대화형 모드인지 확인하세요(`--print` 아님). |
 | `google-adk` 가져오기 오류 (M3) | venv가 활성화되어 있는지 확인하세요: `source .venv/bin/activate` |

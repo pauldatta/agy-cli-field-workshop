@@ -130,7 +130,7 @@ agy --print "What is 2 + 2?" --print-timeout 30s
 | 인증 오류 / 브라우저가 열리지 않음 | SSH 세션의 경우 출력된 URL을 수동으로 복사하세요. 로컬의 경우 기본 브라우저 설정을 확인하세요. `/logout`을 실행하고 다시 시도하세요. |
 | `agy plugin list`가 `No imported plugins.`를 반환함 | 새로 설치한 경우 정상적인 동작입니다(JSON 아님). 모듈 2에서 플러그인을 추가하게 됩니다. |
 | 첫 응답이 느림 | agy가 작업 공간을 인덱싱하므로 첫 실행은 더 느릴 수 있습니다. |
-| 설정이 로드되지 않음 | `~/.gemini/antigravity/settings.json`(사용자 설정) 및 `.agents/`(프로젝트 설정)를 확인하세요. |
+| 설정이 로드되지 않음 | `~/.gemini/antigravity-cli/settings.json`(사용자 설정) 및 `.agents/`(프로젝트 설정)를 확인하세요. |
 
 ---
 

@@ -34,7 +34,7 @@ agy plugin list | python3 -m json.tool
 agy plugin import gemini
 ```
 
-agy는 로컬 Gemini CLI 설치를 스캔하여 설치된 모든 플러그인을 검색하고, 해당 구성 요소(스킬, 명령어, MCP 서버, 에이전트)를 `~/.gemini/antigravity/`에 있는 agy의 설정으로 스테이징합니다.
+agy는 로컬 Gemini CLI 설치를 스캔하여 설치된 모든 플러그인을 검색하고, 해당 구성 요소(스킬, 명령어, MCP 서버, 에이전트)를 `~/.gemini/antigravity-cli/`에 있는 agy의 설정으로 스테이징합니다.
 
 출력은 다음과 같습니다:
 
@@ -193,7 +193,7 @@ agy plugin validate samples/plugins/workshop-helpers/
 
 ```mermaid
 graph LR
-    GC["Gemini CLI\n플러그인"] --> |agy plugin import gemini| S["플러그인 스테이징\n~/.gemini/antigravity/plugins/"]
+    GC["Gemini CLI\n플러그인"] --> |agy plugin import gemini| S["플러그인 스테이징\n~/.gemini/antigravity-cli/plugins/"]
     CC["Claude Code\n확장 프로그램"] --> |agy plugin import claude| S
     S --> |agy plugin enable/disable| A[agy 세션]
     A --> SK[스킬]
@@ -207,7 +207,7 @@ graph LR
 Plugin staging directory structure:
 
 ```text
-~/.gemini/antigravity/plugins/<name>/
+~/.gemini/antigravity-cli/plugins/<name>/
 ├── plugin.json
 ├── mcp_config.json
 ├── hooks.json
@@ -328,7 +328,7 @@ agentapi send-message <conversation_id> "<prompt>"
 Sidecar output is stored at:
 
 ```text
-~/.gemini/antigravity/sidecar_data/<sidecarId>/
+~/.gemini/antigravity-cli/sidecar_data/<sidecarId>/
 ├── data/     ← 영구 스토리지 (ANTIGRAVITY_EXECUTABLE_DATA_DIR 환경 변수)
 ├── logs/     ← 타임스탬프가 기록된 stdout/stderr 로그
 └── events/   ← agentapi 호출의 JSON 레코드
@@ -373,7 +373,7 @@ Sidecar output is stored at:
 2. cron을 `0 9 * * 1-5`(월~금 오전 9시)로 설정합니다.
 3. `agentapi new-conversation`을 사용하여 스탠드업 프롬프트로 대화를 엽니다.
 4. `~/.gemini/config/config.json`에서 이를 활성화합니다.
-5. `~/.gemini/antigravity/sidecar_data/standup/logs/`의 로그에 나타나는지 확인합니다.
+5. `~/.gemini/antigravity-cli/sidecar_data/standup/logs/`의 로그에 나타나는지 확인합니다.
 
 **추가 목표:** `command: python3`을 사용하여 로컬 파일의 변경 사항을 감시하고, 차이점을 감지하면 기존 대화에 메시지를 보내는 두 번째 사이드카를 추가합니다.
 

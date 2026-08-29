@@ -89,7 +89,7 @@ Inside the session, ask:
 Check the sidecar's runtime data directory:
 
 ```bash
-ls -la ~/.gemini/antigravity/sidecar_data/standup/logs/
+ls -la ~/.gemini/antigravity-cli/sidecar_data/standup/logs/
 ```
 
 If the directory exists, the sidecar has been registered. Log files appear here with timestamped stdout/stderr output after each scheduled run.
@@ -104,13 +104,13 @@ Examine the full sidecar data structure:
 
 ```bash
 # The sidecar runtime directory layout
-find ~/.gemini/antigravity/sidecar_data/standup/ -type f 2>/dev/null
+find ~/.gemini/antigravity-cli/sidecar_data/standup/ -type f 2>/dev/null
 ```
 
 Expected structure:
 
 ```text
-~/.gemini/antigravity/sidecar_data/standup/
+~/.gemini/antigravity-cli/sidecar_data/standup/
 ├── data/     ← persistent storage (ANTIGRAVITY_EXECUTABLE_DATA_DIR env var)
 ├── logs/     ← timestamped stdout/stderr logs
 └── events/   ← JSON records of agentapi calls
@@ -196,5 +196,5 @@ Enable it in `~/.gemini/config/config.json`:
 - [ ] `~/.gemini/config/sidecars/standup/sidecar.json` exists with `schedule` builtin and `0 9 * * 1-5` cron
 - [ ] `~/.gemini/config/config.json` has `sidecars.standup.enabled: true`
 - [ ] AGY recognises the sidecar (confirmed via session query or log directory presence)
-- [ ] Sidecar runtime directory exists at `~/.gemini/antigravity/sidecar_data/standup/`
+- [ ] Sidecar runtime directory exists at `~/.gemini/antigravity-cli/sidecar_data/standup/`
 - [ ] *(Stretch)* File-watcher sidecar created with `command: python3` and a working `watch.py`

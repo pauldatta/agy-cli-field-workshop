@@ -89,7 +89,7 @@ agy
 사이드카의 런타임 데이터 디렉터리를 확인합니다:
 
 ```bash
-ls -la ~/.gemini/antigravity/sidecar_data/standup/logs/
+ls -la ~/.gemini/antigravity-cli/sidecar_data/standup/logs/
 ```
 
 디렉터리가 존재하면 사이드카가 등록된 것입니다. 예약된 실행이 끝날 때마다 타임스탬프가 찍힌 stdout/stderr 출력과 함께 로그 파일이 여기에 나타납니다.
@@ -104,13 +104,13 @@ ls -la ~/.gemini/antigravity/sidecar_data/standup/logs/
 
 ```bash
 # The sidecar runtime directory layout
-find ~/.gemini/antigravity/sidecar_data/standup/ -type f 2>/dev/null
+find ~/.gemini/antigravity-cli/sidecar_data/standup/ -type f 2>/dev/null
 ```
 
 예상되는 구조:
 
 ```text
-~/.gemini/antigravity/sidecar_data/standup/
+~/.gemini/antigravity-cli/sidecar_data/standup/
 ├── data/     ← persistent storage (ANTIGRAVITY_EXECUTABLE_DATA_DIR env var)
 ├── logs/     ← timestamped stdout/stderr logs
 └── events/   ← JSON records of agentapi calls
@@ -196,5 +196,5 @@ if __name__ == "__main__":
 - [ ] `schedule` 내장 기능과 `0 9 * * 1-5` 크론(cron)이 포함된 `~/.gemini/config/sidecars/standup/sidecar.json` 파일이 존재합니다.
 - [ ] `~/.gemini/config/config.json`에 `sidecars.standup.enabled: true`가 설정되어 있습니다.
 - [ ] AGY가 사이드카를 인식합니다(세션 쿼리 또는 로그 디렉터리 존재 여부로 확인됨).
-- [ ] `~/.gemini/antigravity/sidecar_data/standup/`에 사이드카 런타임 디렉터리가 존재합니다.
+- [ ] `~/.gemini/antigravity-cli/sidecar_data/standup/`에 사이드카 런타임 디렉터리가 존재합니다.
 - [ ] *(추가 목표)* `command: python3` 및 정상 작동하는 `watch.py`로 파일 감시자(File-watcher) 사이드카가 생성되었습니다.

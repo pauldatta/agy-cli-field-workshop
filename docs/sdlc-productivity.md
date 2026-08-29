@@ -74,18 +74,25 @@ Only apply after you've read the proposed change.
 
 ### Permissions Model
 
-agy has a **3-level permissions model** that controls how it handles tool approvals:
+agy has a **4-level permissions model** (`toolPermission` in `settings.json`) that controls how it handles tool approvals:
 
 | Level | Behavior |
 | :-- | :-- |
 | `request-review` | **Default.** agy asks for approval before writing files or running commands |
+| `proceed-in-sandbox` | Auto-approve within sandbox restrictions, prompt for elevated actions |
 | `always-proceed` | Auto-approve all tool calls — useful for trusted scripts and CI |
 | `strict` | Deny all tool use unless explicitly allowed — maximum control |
 
-Use the `/permissions` slash command to view or change the current level. You can also set fine-grained rules in `settings.json`:
+Use the `/permissions` slash command to view or change the current level. You can also configure fine-grained settings in `~/.gemini/antigravity-cli/settings.json` or `.agents/settings.json`:
 
 ```json
 {
+  "toolPermission": "request-review",
+  "artifactReviewPolicy": "asks-for-review",
+  "altScreenMode": "default",
+  "editorMode": "default",
+  "allowNonWorkspaceAccess": false,
+  "enableTerminalSandbox": true,
   "permissions": {
     "allow": ["command(git)", "read_file"],
     "deny": ["command(rm -rf)"]
@@ -93,7 +100,7 @@ Use the `/permissions` slash command to view or change the current level. You ca
 }
 ```
 
-> 📖 Full details: [Permissions docs](https://www.antigravity.google/docs/permissions) · [Strict Mode docs](https://www.antigravity.google/docs/strict-mode)
+> 📖 Full details: [Permissions docs](https://antigravity.google/docs/permissions)
 
 ---
 
@@ -203,9 +210,9 @@ Beyond AGENTS.md, agy also loads:
 
 | Agent | Model | Purpose |
 | :-- | :-- | :-- |
-| `doc-writer.md` | `gemini-3.5-flash` | Generates API docs, README sections, and inline comments from source |
-| `pr-reviewer.md` | `gemini-3.5-flash` | Reviews code changes for quality, bugs, and style violations |
-| `migration-validator.md` | `gemini-3.5-flash` | Validates Gemini CLI → Antigravity CLI migration completeness |
+| `doc-writer.md` | `gemini-3.7-flash` | Generates API docs, README sections, and inline comments from source |
+| `pr-reviewer.md` | `gemini-3.7-flash` | Reviews code changes for quality, bugs, and style violations |
+| `migration-validator.md` | `gemini-3.7-flash` | Validates Gemini CLI → Antigravity CLI migration completeness |
 
 ---
 
@@ -218,18 +225,25 @@ Beyond AGENTS.md, agy also loads:
 
 | Command | What it does |
 | :-- | :-- |
-| `/rewind` (or `/undo`) | Roll back conversation history to a previous checkpoint |
 | `/resume` (or `/switch`) | Open conversation picker to resume or switch sessions |
+| `/rewind` (or `/undo`) | Roll back conversation history to a previous checkpoint |
+| `/fork` (or `/branch`) | Branch the active conversation into an isolated workspace |
 | `/rename <name>` | Rename the active conversation thread |
+| `/clear` (or `/new`) | Clear active context and start a new conversation |
 | `/config` (or `/settings`) | Open full-screen settings overlay |
-| `/permissions` | Set agent autonomy level (`request-review`, `always-proceed`, `strict`) |
+| `/permissions` | Set agent autonomy level (`request-review`, `proceed-in-sandbox`, `always-proceed`, `strict`) |
 | `/model` | Select reasoning model (persists across sessions) |
+| `/teamwork-preview` | Launch collaborative multi-agent teams |
+| `/diff` | Open interactive git diff viewer |
+| `/btw <query>` | Inject a guidance note into an active agent task |
 | `/tasks` | Monitor, view logs for, or terminate background tasks |
 | `/agents` | View, manage, and approve subagent actions |
-| `/open <path>` | Open a file in your preferred external editor |
-| `/usage` | Open the inline interactive help manual |
 | `/skills` | Browse local and global agent skills |
 | `/mcp` | Configure and manage MCP servers |
+| `/context` | View active context token usage |
+| `/credits` | View remaining G1 credit balances |
+| `/open <path>` | Open a file in your preferred external editor |
+| `/usage` | Open the inline interactive help manual |
 
 > 📖 Full slash command reference: [CLI Features](https://antigravity.google/docs/cli-features)
 
@@ -241,10 +255,16 @@ Beyond AGENTS.md, agy also loads:
 | `!` | Run terminal commands directly without leaving agy |
 | `esc esc` | Clear the current prompt input (when no streaming is active) |
 | `?` | Get help and list all slash commands |
-| `alt+enter` / `ctrl+j` / `shift+enter` | Insert a newline in your prompt (multi-line input) |
-| `ctrl+g` | Edit prompt inside your default shell editor |
+| `alt+enter` / `shift+enter` / `ctrl+j` | Insert a newline in your prompt (`prompt.newline`) |
+| `ctrl+g` | Edit prompt inside your default shell editor (`$EDITOR`) |
 | `ctrl+l` | Clear TUI screen |
-| `ctrl+d` | Exit the CLI |
+| `ctrl+d` | Exit the CLI (or forward delete character) |
+| `alt+j` | Teleport to next pending subagent approval (`prompt.teleport_agent`) |
+| `ctrl+k` | Fast-approve pending subagent permission from main conversation |
+| `ctrl+o` | Toggle reasoning trajectory expansion (`prompt.toggle_trajectory`) |
+| `ctrl+r` | Open Artifact Review Panel (`prompt.open_review`) |
+| `ctrl+v` | Paste graphic media or clipboard block into prompt |
+| `f5` | Toggle voice dictation (`voice.start_dictation`) |
 
 > 📖 Full keybindings reference: [Using Antigravity CLI](https://antigravity.google/docs/cli-using)
 
@@ -270,7 +290,7 @@ Shows each plugin's name, source, import date, and components (skills, commands,
 agy plugin import gemini
 ```
 
-agy scans your local Gemini CLI installation, discovers all installed plugins, and stages their components into `~/.gemini/antigravity/`. Output:
+agy scans your local Gemini CLI installation, discovers all installed plugins, and stages their components into `~/.gemini/antigravity-cli/`. Output:
 
 ```text
   [ok]    code-review
@@ -319,7 +339,7 @@ agy plugin enable gemini-deep-research
 
 | Scope | Path |
 | :-- | :-- |
-| **Global** | `~/.gemini/antigravity/plugins/` |
+| **Global** | `~/.gemini/antigravity-cli/plugins/` |
 | **Project** | `.agents/plugins/` |
 
 ### Building a Custom Plugin

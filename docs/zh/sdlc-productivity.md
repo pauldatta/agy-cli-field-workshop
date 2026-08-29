@@ -250,7 +250,7 @@ agy 会自动将你的 AGENTS.md 整合到随后的每个会话中。
 
 ---
 
-## 1.7 — 使用插件扩展 <span class="duration-badge">15 min</span>
+## 1.7 — 使用插件扩展 <span class="duration-badge">15 min</span> {: #17-extend-with-plugins-15-min }
 
 > **模式：自带工具链** — 插件为 agy 添加技能、MCP 服务器、代理和规则。一次安装，在每个会话中均可使用。
 
@@ -270,7 +270,7 @@ agy plugin list
 agy plugin import gemini
 ```
 
-agy 会扫描您本地的 Gemini CLI 安装，发现所有已安装的插件，并将其组件暂存到 `~/.gemini/antigravity/` 中。输出：
+agy 会扫描您本地的 Gemini CLI 安装，发现所有已安装的插件，并将其组件暂存到 `~/.gemini/antigravity-cli/` 中。输出：
 
 ```text
   [ok]    code-review
@@ -319,7 +319,7 @@ agy plugin enable gemini-deep-research
 
 | Scope | Path |
 | :-- | :-- |
-| **Global** | `~/.gemini/antigravity/plugins/` |
+| **Global** | `~/.gemini/antigravity-cli/plugins/` |
 | **Project** | `.agents/plugins/` |
 
 ### Building a Custom Plugin

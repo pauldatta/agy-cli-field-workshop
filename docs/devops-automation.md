@@ -173,7 +173,7 @@ git diff --cached | agy --dangerously-skip-permissions \
 
 ### Enabling the Sandbox
 
-The sandbox is configured via `settings.json` (either project `.agents/settings.json` or user `~/.gemini/antigravity/settings.json`):
+The sandbox is configured via `settings.json` (either project `.agents/settings.json` or user `~/.gemini/antigravity-cli/settings.json`):
 
 ```json
 {

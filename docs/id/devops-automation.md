@@ -173,7 +173,7 @@ git diff --cached | agy --dangerously-skip-permissions \
 
 ### Mengaktifkan Sandbox
 
-Sandbox dikonfigurasi melalui `settings.json` (baik proyek `.agents/settings.json` atau pengguna `~/.gemini/antigravity/settings.json`):
+Sandbox dikonfigurasi melalui `settings.json` (baik proyek `.agents/settings.json` atau pengguna `~/.gemini/antigravity-cli/settings.json`):
 
 ```json
 {

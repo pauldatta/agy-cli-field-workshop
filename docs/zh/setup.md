@@ -130,7 +130,7 @@ agy --print "What is 2 + 2?" --print-timeout 30s
 | 身份验证错误 / 浏览器未打开 | 对于 SSH 会话，请手动复制打印的 URL。对于本地环境，请检查默认浏览器设置。运行 `/logout` 并重试 |
 | `agy plugin list` 返回 `No imported plugins.` | 全新安装时的预期行为（非 JSON）。您将在模块 2 中填充插件 |
 | 首次响应缓慢 | 首次运行可能会比较慢，因为 agy 正在索引您的工作区 |
-| 配置未加载 | 检查 `~/.gemini/antigravity/settings.json`（用户设置）和 `.agents/`（项目设置） |
+| 配置未加载 | 检查 `~/.gemini/antigravity-cli/settings.json`（用户设置）和 `.agents/`（项目设置） |
 
 ---
 

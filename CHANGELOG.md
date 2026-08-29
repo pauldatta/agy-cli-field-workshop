@@ -4,6 +4,34 @@ Content-specific changes to workshop materials — CLI breakages, deprecated com
 
 ---
 
+## 2026-08-29
+
+### ✅ Antigravity 2.11 / CLI v1.1.22 / SDK v0.1.15 Modernization Audit & Fixes
+
+**Affects:** All documentation, exercises 02b, 07, 10, 11, AUDIT.md, research grounding data
+
+- **SDK Runtime Fixes:**
+  - Fixed `ToolResult.success` AttributeError in `docs/agy-sdk.md` (replaced with `tool_result.error is None`).
+  - Fixed `HookResult` schema mismatch in `docs/agy-sdk.md` and `ex10_first_agent.md` (removed unsupported `message` parameter).
+  - Fixed `WRITE_TOOLS` in `ex10_first_agent.md` to use SDK built-in constants `BuiltinTools.CREATE_FILE`, `BuiltinTools.EDIT_FILE`, `BuiltinTools.RUN_COMMAND`.
+  - Fixed session persistence in `docs/agy-sdk.md` and `ex11_multi_agent_pipeline.md` by explicitly setting `save_dir` on initial `LocalAgentConfig`.
+  - Updated SDK default model to `gemini-3.7-flash` (SDK v0.1.15 default) and image model to `gemini-3.1-flash-lite-image`.
+- **CLI Keybinding & Command Alignments:**
+  - Corrected subagent teleport shortcut from `ctrl+j` to `alt+j` across cheatsheet, Module 4, Module 1, and legacy modernization.
+  - Added missing shortcuts: `ctrl+o` (trajectory toggle), `ctrl+r` (open review panel), `ctrl+v` (paste media), `f5` (voice dictation).
+  - Added modern slash commands to Cheatsheet and Module 1: `/teamwork-preview`, `/diff`, `/btw`, `/goal`, `/grill-me`, `/schedule`, `/browser`, `/fast`, `/planning`, `/voice`, `/context`, `/credits`, `/hooks`, `/copy`, `/exit`.
+- **Configuration & Path Normalizations:**
+  - Normalized CLI state directories from `~/.gemini/antigravity/` to `~/.gemini/antigravity-cli/`.
+  - Standardized `.agents/mcp.json` references to `.agents/mcp_config.json`.
+  - Documented typed `settings.json` keys: `toolPermission`, `artifactReviewPolicy`, `altScreenMode`, `editorMode`, `vimInsertFirst`, `runningLightSpeed`, `allowNonWorkspaceAccess`, `enableTerminalSandbox`, `useG1Credits`.
+- **Facilitator Guide Decoupling:**
+  - Cleaned up crossover references in `docs/facilitator-guide.md` to cleanly separate Module 3 (`google-antigravity` SDK) from Module 5 (`google-adk` / `agents-cli`).
+- **Ground Truth & Verification:**
+  - Refreshed `AUDIT.md` (115 verified claims, 0 drift).
+  - Validated all 93 code blocks and verified `scripts/precommit-checks.sh` and `scripts/detect-drift.sh --upstream`.
+
+---
+
 ## 2026-06-09
 
 ### ✅ Exercise 12 — Eval Judge Model & Standalone Lab Guide

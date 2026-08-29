@@ -82,7 +82,7 @@ def list_directory(directory_path: str) -> str:
 Create `tools/state_tools.py` with a stateful tool using `ToolContext`:
 
 ```python
-from google.antigravity.tools.tool_context import ToolContext
+from google.antigravity import ToolContext
 
 
 def record_finding(
@@ -190,7 +190,7 @@ def load_skill(skill_name: str) -> str:
 review_rubric = load_skill("python-review")
 
 agent_config = LocalAgentConfig(
-    model="gemini-3.5-flash",
+    model="gemini-3.7-flash",
     system_instructions=f"""You are a senior Python code reviewer.
 
 Your job:
@@ -221,10 +221,17 @@ Create `hooks/security_guard.py`:
 
 ```python
 from google.antigravity.hooks import hooks
-from google.antigravity.types import ToolCall, HookResult
+from google.antigravity.types import BuiltinTools, ToolCall, HookResult
 
 # Tools that could modify the filesystem
-WRITE_TOOLS = {"write_to_file", "edit_file", "replace_file_content", "run_command"}
+WRITE_TOOLS = {
+    BuiltinTools.CREATE_FILE,
+    BuiltinTools.EDIT_FILE,
+    BuiltinTools.RUN_COMMAND,
+    "create_file",
+    "edit_file",
+    "run_command",
+}
 
 
 @hooks.pre_tool_call_decide
@@ -234,18 +241,12 @@ async def block_writes(tool_call: ToolCall) -> HookResult:
     This agent is read-only — it reviews code but never changes it.
     """
     if tool_call.name in WRITE_TOOLS:
-        return HookResult(
-            allow=False,
-            message=f"Blocked: {tool_call.name} is not allowed. This agent is read-only.",
-        )
+        return HookResult(allow=False)
 
-    if tool_call.name == "run_command":
+    if tool_call.name in (BuiltinTools.RUN_COMMAND, "run_command"):
         cmd = tool_call.args.get("CommandLine", "")
         if any(danger in cmd for danger in ["rm ", "mv ", "chmod", "chown", "dd "]):
-            return HookResult(
-                allow=False,
-                message=f"Blocked dangerous command: {cmd}",
-            )
+            return HookResult(allow=False)
 
     return HookResult(allow=True)
 ```

@@ -224,7 +224,7 @@ from google.antigravity.hooks import hooks
 from google.antigravity.types import ToolCall, HookResult
 
 # Tools that could modify the filesystem
-WRITE_TOOLS = {"write_to_file", "edit_file", "replace_file_content", "run_command"}
+WRITE_TOOLS = {BuiltinTools.CREATE_FILE, BuiltinTools.EDIT_FILE, BuiltinTools.RUN_COMMAND}
 
 
 @hooks.pre_tool_call_decide

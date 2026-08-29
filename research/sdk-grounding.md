@@ -1,7 +1,6 @@
 # google-antigravity SDK Grounding Data
 
-_Generated: 2026-05-25 — source: every .py file in the installed package at_
-_`/Users/pauldatta/Code/antigravity-sdk-experiments/.venv/lib/python3.11/site-packages/google/antigravity/`_
+_Generated: 2026-08-29 — source: google-antigravity v0.1.15 package_
 _plus official docs at `https://antigravity.google/docs/sdk-overview`_
 
 ---
@@ -229,7 +228,7 @@ from google.antigravity.hooks import policy
 
 async def main():
     config = LocalAgentConfig(
-        model="gemini-3.5-flash",
+        model="gemini-3.7-flash",
         system_instructions="You are a helpful assistant.",
         tools=[my_tool],
         policies=[policy.allow_all()],
@@ -286,19 +285,26 @@ agent.conversation_id             # str | None — save to resume later
 
 **Resuming a session:**
 ```python
-# First run — save the conversation_id
-async with Agent(config) as agent:
+save_dir = "/path/to/session_storage"
+
+# First run — specify save_dir to persist trajectory
+init_config = LocalAgentConfig(
+    save_dir=save_dir,
+    model="gemini-3.7-flash",
+    policies=[policy.allow_all()],
+)
+async with Agent(init_config) as agent:
     await agent.chat("Hello")
     conv_id = agent.conversation_id
 
-# Resume
-config2 = LocalAgentConfig(
+# Resume using the same save_dir and conversation_id
+resume_config = LocalAgentConfig(
     conversation_id=conv_id,
-    save_dir="/same/save/dir/as/first/run",
-    model="gemini-3.5-flash",
+    save_dir=save_dir,
+    model="gemini-3.7-flash",
     policies=[policy.allow_all()],
 )
-async with Agent(config2) as agent:
+async with Agent(resume_config) as agent:
     await agent.chat("Continue from where we left off")
 ```
 

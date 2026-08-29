@@ -110,7 +110,7 @@
 | "我可以使用自己的 API 密钥吗？" | agy 使用基于浏览器的 Google 登录。企业级用户连接 GCP 项目。请参阅 [企业级文档](https://www.antigravity.google/docs/enterprise)。 |
 | "代码会发送给 Google 吗？" | 有关数据处理的详细信息，请参阅 [常见问题解答 (FAQ)](https://www.antigravity.google/docs/faq)。 |
 | "钩子怎么处理？" | agy-cli 通过 `hooks.json` 支持钩子。请参阅 [钩子文档](https://www.antigravity.google/docs/hooks)。 |
-| "对话日志存储在哪里？" | `~/.gemini/antigravity/conversations/` |
+| "对话日志存储在哪里？" | `~/.gemini/antigravity-cli/conversations/` |
 | "我的 Gemini CLI 主题没有导入。" | 这是符合预期的 —— 在执行 `agy plugin import gemini` 期间，自定义主题会被静默丢弃。技能、MCP 服务器和代理会结转过来。 |
 | "我可以将 SDK 代理部署到 Cloud Run 吗？" | 可以 —— 使用 `adk deploy cloud_run`。请参阅模块 3 第 3.6 节。 |
 
@@ -122,7 +122,7 @@
 | :-- | :-- |
 | `agy: command not found` | 检查 PATH。运行 `which agy` 或 `which agy-cli`。 |
 | 身份验证错误 / 401 | 会话凭据可能已过期。重新分发身份验证信息。 |
-| `agy plugin list` 错误 | 检查 `~/.gemini/antigravity/` 是否存在 |
+| `agy plugin list` 错误 | 检查 `~/.gemini/antigravity-cli/` 是否存在 |
 | 响应缓慢 | 检查网络。空闲后的首次运行可能会因为工作区索引而变慢。 |
 | 子代理未生成 | 确认参与者处于交互模式（而不是 `--print`） |
 | `google-adk` 导入错误 (M3) | 确保 venv 已激活：`source .venv/bin/activate` |

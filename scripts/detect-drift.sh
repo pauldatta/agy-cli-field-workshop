@@ -136,6 +136,60 @@ if [ -f "mkdocs.yml" ]; then
   done
 fi
 
+# --- 8. Dual-copy exercise parity (docs/exercises/*.md ↔ exercises/*.md) ---
+log_section "  Checking dual-copy exercise parity..."
+
+for doc_ex in docs/exercises/ex*.md; do
+  [ -f "$doc_ex" ] || continue
+  ex_base=$(basename "$doc_ex")
+  root_ex="exercises/$ex_base"
+  if [ ! -f "$root_ex" ]; then
+    log_fail "Exercise '$doc_ex' has no matching copy at '$root_ex'"
+  elif ! diff -q "$doc_ex" "$root_ex" > /dev/null 2>&1; then
+    log_fail "Exercise drift: '$doc_ex' and '$root_ex' differ — run 'cp $doc_ex $root_ex'"
+  else
+    log_ok "Exercise copy in sync: $ex_base"
+  fi
+done
+
+# --- 9. SDK API & Runtime Integrity Checks ---
+log_section "  Checking SDK APIs, types, and runtime conventions in docs/..."
+
+# A: ToolResult.success
+if grep -rnE 'tool_result\.success|\.success\b.*ToolResult' docs/ 2>/dev/null; then
+  log_fail "Detected invalid 'tool_result.success' — use 'tool_result.error is None'"
+else
+  log_ok "SDK ToolResult API: no invalid .success accesses"
+fi
+
+# B: HookResult message parameter
+if grep -rnE 'HookResult\([^)]*message=' docs/ 2>/dev/null; then
+  log_fail "Detected invalid 'HookResult(message=...)' — HookResult only accepts allow: bool"
+else
+  log_ok "SDK HookResult schema: compliant"
+fi
+
+# C: CLI write tool names in SDK Python sets
+if grep -rnE 'WRITE_TOOLS\s*=\s*\{[^}]*write_to_file' docs/ 2>/dev/null; then
+  log_fail "Detected CLI tool name 'write_to_file' in SDK WRITE_TOOLS — use BuiltinTools.CREATE_FILE"
+else
+  log_ok "SDK WRITE_TOOLS constants: compliant"
+fi
+
+# D: Legacy CLI state paths
+if grep -rnE '~/\.gemini/antigravity/' docs/ 2>/dev/null; then
+  log_fail "Detected legacy '~/.gemini/antigravity/' path — use '~/.gemini/antigravity-cli/'"
+else
+  log_ok "CLI state paths: normalized to ~/.gemini/antigravity-cli/"
+fi
+
+# E: Keybinding accuracy
+if grep -rnE 'ctrl\+j.*teleport|teleport.*ctrl\+j' docs/ 2>/dev/null; then
+  log_fail "Detected stale 'ctrl+j' for subagent teleport — must be 'alt+j'"
+else
+  log_ok "Subagent teleport shortcut: verified alt+j"
+fi
+
 # ═══════════════════════════════════════════════════════════
 # UPSTREAM DRIFT CHECKS (validates against AUDIT.md ground truth)
 # ═══════════════════════════════════════════════════════════
@@ -161,10 +215,10 @@ if $CHECK_UPSTREAM; then
 
     # --- Check slash commands used in docs are grounded in AUDIT.md ---
     log_section "  Checking slash commands against AUDIT.md..."
-    grep -rhoE '/[a-z]+' docs/*.md 2>/dev/null | grep -E '^/[a-z]{2,}$' | sort -u | while read -r cmd; do
+    grep -rhoE '`/[a-z][a-z0-9_-]+`' docs/*.md 2>/dev/null | tr -d '`' | sort -u | while read -r cmd; do
       cmd_name="${cmd#/}"
-      # Skip common false positives (file paths, URLs)
-      case "$cmd_name" in dev|bin|etc|usr|tmp|src|var|opt|home|docs) continue ;; esac
+      # Skip common non-command patterns
+      case "$cmd_name" in dev|bin|etc|usr|tmp|src|var|opt|home|docs|exercises|samples|assets|scripts) continue ;; esac
       if grep -qw "$cmd_name" "$AUDIT_FILE"; then
         log_ok "Slash command '${cmd}' grounded in AUDIT.md"
       else

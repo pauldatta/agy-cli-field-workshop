@@ -250,7 +250,7 @@ AGENTS.md 외에도 agy는 다음을 로드합니다:
 
 ---
 
-## 1.7 — 플러그인으로 확장하기 <span class="duration-badge">15분</span>
+## 1.7 — 플러그인으로 확장하기 <span class="duration-badge">15분</span> {: #17-extend-with-plugins-15-min }
 
 > **패턴: 자체 툴체인 가져오기** — 플러그인은 agy에 스킬, MCP 서버, 에이전트 및 규칙을 추가합니다. 한 번 설치하면 모든 세션에서 사용할 수 있습니다.
 
@@ -270,7 +270,7 @@ agy plugin list
 agy plugin import gemini
 ```
 
-agy는 로컬 Gemini CLI 설치를 스캔하고, 설치된 모든 플러그인을 발견하여 해당 구성 요소를 `~/.gemini/antigravity/`에 스테이징합니다. 출력:
+agy는 로컬 Gemini CLI 설치를 스캔하고, 설치된 모든 플러그인을 발견하여 해당 구성 요소를 `~/.gemini/antigravity-cli/`에 스테이징합니다. 출력:
 
 ```text
   [ok]    code-review
@@ -319,7 +319,7 @@ agy plugin enable gemini-deep-research
 
 | Scope | Path |
 | :-- | :-- |
-| **Global** | `~/.gemini/antigravity/plugins/` |
+| **Global** | `~/.gemini/antigravity-cli/plugins/` |
 | **Project** | `.agents/plugins/` |
 
 ### Building a Custom Plugin
