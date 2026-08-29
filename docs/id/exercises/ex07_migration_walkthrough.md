@@ -1,33 +1,33 @@
-# Latihan 7 — Penelusuran Migrasi
+# Exercise 7 — Migration Walkthrough
 
-> **Modul:** Lampiran — Panduan Migrasi
-> **Waktu:** 20 menit
-> **Format:** Individu atau berpasangan
-
----
-
-## Tujuan
-
-Telusuri direktori proyek Gemini CLI yang sebenarnya dan migrasikan ke AGY CLI. Anda akan memperbarui lokasi file konfigurasi, definisi server MCP, nama peristiwa hook, dan konten AGENTS.md — kemudian memvalidasinya menggunakan sub-agen `migration-validator`.
+> **Module:** Appendix — Migration Guide
+> **Time:** 20 min
+> **Format:** Individual or pair
 
 ---
 
-## Latar Belakang
+## Objective
 
-Saat tim melakukan migrasi dari Gemini CLI ke AGY CLI, terdapat empat titik kerusakan umum:
+Walk through a real Gemini CLI project directory and migrate it to AGY CLI. You'll update config file locations, MCP server definitions, hook event names, and AGENTS.md content — then validate using the `migration-validator` subagent.
 
-| Apa yang rusak | Mengapa |
+---
+
+## Background
+
+When teams migrate from Gemini CLI to AGY CLI, there are four common breakage points:
+
+| What breaks | Why |
 | :-- | :-- |
-| Peristiwa hook `SessionStart`, `BeforeTool`, `AfterTool` | Diubah namanya menjadi `PreInvocation`, `PreToolUse`, `PostToolUse` |
-| Kunci `url` MCP di `settings.json` | AGY menggunakan `serverUrl` dalam `mcp.json` yang terpisah |
-| Direktori konfigurasi proyek `.gemini/` | AGY menggunakan `.agents/` |
-| Berkas biner `gemini` dalam skrip | Harus diperbarui menjadi `agy` |
+| Hook events `SessionStart`, `BeforeTool`, `AfterTool` | Renamed to `PreInvocation`, `PreToolUse`, `PostToolUse` |
+| MCP `url` key in `settings.json` | AGY uses `serverUrl` in a separate `mcp_config.json` |
+| `.gemini/` project config dir | AGY uses `.agents/` |
+| `gemini` binary in scripts | Must be updated to `agy` |
 
 ---
 
-## Pengaturan
+## Setup
 
-Anda memerlukan contoh proyek Gemini CLI untuk dimigrasikan. Buat starter:
+You need a sample Gemini CLI project to migrate. Create the starter:
 
 ```bash
 mkdir ~/gemini-migration-lab && cd ~/gemini-migration-lab
@@ -87,11 +87,11 @@ EOF
 
 ---
 
-## Bagian 1 — Migrasi Manual (10 menit)
+## Part 1 — Manual Migration (10 min)
 
-Migrasikan proyek ini sendiri:
+Migrate the project yourself:
 
-### Langkah 1: Pindahkan konfigurasi ke direktori AGY
+### Step 1: Move config to AGY directories
 
 ```bash
 mkdir -p .agents/hooks
@@ -100,10 +100,10 @@ cp .gemini/GEMINI.md .agents/AGENTS.md
 cp .gemini/settings.json .agents/settings.json
 ```
 
-### Langkah 2: Pisahkan konfigurasi MCP
+### Step 2: Separate MCP config
 
 ```bash
-# AGY uses mcp.json, not mcpServers in settings.json
+# AGY uses mcp_config.json, not mcpServers in settings.json
 cat > .agents/mcp_config.json << 'EOF'
 {
   "mcpServers": {
@@ -118,37 +118,40 @@ cat > .agents/mcp_config.json << 'EOF'
 EOF
 ```
 
-### Langkah 3: Tulis ulang nama peristiwa hook di settings.json
+### Step 3: Migrate hooks to .agents/hooks.json
 
-```json
+```bash
+# AGY configures lifecycle hooks in .agents/hooks.json with renamed events:
+cat > .agents/hooks.json << 'EOF'
 {
-  "hooks": {
+  "session-context": {
     "PreInvocation": [
       {
-        "hooks": [{
-          "name": "session-context",
-          "type": "command",
-          "command": "$AGY_PROJECT_DIR/.agents/hooks/session-context.sh",
-          "timeout": 3000
-        }]
+        "type": "command",
+        "command": "$AGY_PROJECT_DIR/.agents/hooks/session-context.sh",
+        "timeout": 5
       }
-    ],
+    ]
+  },
+  "secret-scanner": {
     "PreToolUse": [
       {
-        "matcher": "write_file|edit",
-        "hooks": [{
-          "name": "secret-scanner",
-          "type": "command",
-          "command": "$AGY_PROJECT_DIR/.agents/hooks/secret-scanner.sh",
-          "timeout": 2000
-        }]
+        "matcher": "write_to_file|replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$AGY_PROJECT_DIR/.agents/hooks/secret-scanner.sh",
+            "timeout": 5
+          }
+        ]
       }
     ]
   }
 }
+EOF
 ```
 
-### Langkah 4: Perbarui referensi berkas biner
+### Step 4: Update binary references
 
 ```bash
 sed -i 's/\bgemini\b/agy/g' scripts/review.sh
@@ -156,58 +159,58 @@ sed -i 's/\bgemini\b/agy/g' scripts/review.sh
 
 ---
 
-## Bagian 2 — Validasi dengan Agen Validator Migrasi (5 menit)
+## Part 2 — Validate with the Migration Validator Agent (5 min)
 
-Mulai AGY CLI dan luncurkan validator migrasi:
+Start AGY CLI and launch the migration validator:
 
 ```bash
 cd ~/gemini-migration-lab
 agy
 ```
 
-Di dalam REPL AGY:
+Inside the AGY REPL:
 
 ```text
 Use the migration-validator agent to check this project directory for any remaining Gemini CLI configuration.
 ```
 
-Sub-agen `migration-validator` akan memeriksa:
+The `migration-validator` subagent will check:
 
-- [ ] Nama peristiwa hook (tidak ada `SessionStart`, `BeforeTool`, `AfterTool`)
-- [ ] Format MCP (`serverUrl` untuk SSE, bidang `type` ada)
-- [ ] Referensi berkas biner (`agy` bukan `gemini` dalam skrip)
-- [ ] Jalur konfigurasi (`.agents/` bukan `.gemini/`)
-
----
-
-## Bagian 3 — Diskusi (5 menit)
-
-**Pertanyaan refleksi:**
-
-1. Apa yang akan rusak pertama kali di CI jika Anda lupa memperbarui nama peristiwa hook?
-2. Mengapa AGY memisahkan konfigurasi MCP ke dalam `mcp.json` alih-alih menggabungkannya di `settings.json`?
-3. Jika Anda memiliki monorepo dengan 10 proyek, seperti apa bentuk skrip migrasi Anda?
+- [ ] Hook event names (no `SessionStart`, `BeforeTool`, `AfterTool`)
+- [ ] MCP format (`serverUrl` for SSE, `type` field present)
+- [ ] Binary references (`agy` not `gemini` in scripts)
+- [ ] Config paths (`.agents/` not `.gemini/`)
 
 ---
 
-## Tantangan Bonus
+## Part 3 — Discussion (5 min)
 
-Tambahkan sebuah hook `PreToolUse` ke proyek yang dimigrasikan yang memblokir agen agar tidak memanggil `git push` tanpa konfirmasi. Gunakan pola hook `decision: deny`.
+**Reflection questions:**
 
-Lihat [`samples/hooks/secret-scanner.sh`](https://github.com/pauldatta/agy-cli-field-workshop/blob/main/samples/hooks/secret-scanner.sh) sebagai templat untuk pola keputusan tersebut.
+1. What would break first in CI if you forgot to update the hook event names?
+2. Why does AGY separate MCP config into `mcp_config.json` instead of bundling it in `settings.json`?
+3. If you have a monorepo with 10 projects, what would your migration script look like?
 
 ---
 
-## Poin Penting
+## Bonus Challenge
+
+Add a `PreToolUse` hook to the migrated project that blocks the agent from calling `git push` without a confirmation. Use the hook `decision: deny` pattern.
+
+Refer to [`samples/hooks/secret-scanner.sh`](https://github.com/pauldatta/agy-cli-field-workshop/blob/main/samples/hooks/secret-scanner.sh) as a template for the decision pattern.
+
+---
+
+## Key Takeaways
 
 | Gemini CLI | AGY CLI |
 | :-- | :-- |
 | `SessionStart` | `PreInvocation` |
 | `BeforeTool` | `PreToolUse` |
 | `AfterTool` | `PostToolUse` |
-| alat `replace_in_file` | alat `edit` |
-| direktori proyek `.gemini/` | direktori proyek `.agents/` |
+| `replace_in_file` tool | `edit` tool |
+| `.gemini/` project dir | `.agents/` project dir |
 | `GEMINI.md` | `AGENTS.md` |
-| blok MCP `settings.json` | `mcp.json` dengan `serverUrl` |
-| `url:` untuk SSE | `serverUrl:` untuk SSE |
-| berkas biner `gemini` | berkas biner `agy` |
+| `settings.json` MCP block | `mcp_config.json` with `serverUrl` |
+| `url:` for SSE | `serverUrl:` for SSE |
+| `gemini` binary | `agy` binary |

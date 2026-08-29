@@ -10,55 +10,5 @@
       "command(npm test)",
       "command(npm run lint)"
     ]
-  },
-  "hooks": {
-    "PreInvocation": [
-      {
-        "hooks": [
-          {
-            "name": "session-context",
-            "type": "command",
-            "command": "$AGY_PROJECT_DIR/.agents/hooks/session-context.sh",
-            "timeout": 3000,
-            "description": "Injects project state (branch, dirty files) at session start"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "write_file|edit",
-        "hooks": [
-          {
-            "name": "secret-scanner",
-            "type": "command",
-            "command": "$AGY_PROJECT_DIR/.agents/hooks/secret-scanner.sh",
-            "timeout": 2000,
-            "description": "Blocks hardcoded credentials, steers toward env vars"
-          },
-          {
-            "name": "git-context",
-            "type": "command",
-            "command": "$AGY_PROJECT_DIR/.agents/hooks/git-context-injector.sh",
-            "timeout": 3000,
-            "description": "Injects recent git history for the target file"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "write_file|edit",
-        "hooks": [
-          {
-            "name": "test-nudge",
-            "type": "command",
-            "command": "$AGY_PROJECT_DIR/.agents/hooks/test-nudge.sh",
-            "timeout": 1000,
-            "description": "Reminds agent to consider running tests after source changes"
-          }
-        ]
-      }
-    ]
   }
 }

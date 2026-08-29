@@ -66,6 +66,7 @@ nav:
       - "Autonomous Goals (ex13)": exercises/ex13_autonomous_goals_and_interviews.md
       - "Visual Diffs & UI (ex14)": exercises/ex14_visual_diffs_and_generative_ui.md
       - "Browser DevTools (ex15)": exercises/ex15_browser_devtools_mcp.md
+      - "Lifecycle Hooks (ex16)": exercises/ex16_custom_hooks_and_safety_gates.md
   - "Resources":
       - Cheatsheet: cheatsheet.md
       - Facilitator Guide: facilitator-guide.md

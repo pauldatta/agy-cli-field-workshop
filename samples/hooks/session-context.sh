@@ -1,24 +1,22 @@
 #!/usr/bin/env bash
 # PreInvocation hook: Injects project state into the session context
-# Performance: <200ms — reads package.json + git status
+# Performance: <200ms — reads git status & node version
 #
-# PURPOSE: At the start of every agy session, give the agent a quick
-# summary of the project state: current branch, pending changes,
-# and key dependencies. This steers early prompts toward
-# awareness of what's in-flight.
-#
+# PURPOSE: Before model invocation, gives the agent a summary of project state
 # AGY CLI hook event: PreInvocation
-# Register in: .agents/hooks.json or settings.json under "PreInvocation"
+# Register in: .agents/hooks.json under "PreInvocation"
 
 input=$(cat)
-cwd=$(echo "$input" | jq -r '.cwd' 2>/dev/null)
+
+# Extract primary workspace root directory from stdin metadata
+workspace=$(echo "$input" | jq -r '.workspacePaths[0] // "."' 2>/dev/null)
 
 # Gather lightweight project state
-branch=$(git -C "$cwd" branch --show-current 2>/dev/null || echo "unknown")
-dirty_count=$(git -C "$cwd" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
-node_version=$(node --version 2>/dev/null || echo "not installed")
+branch=$(git -C "$workspace" branch --show-current 2>/dev/null || echo "main")
+dirty_count=$(git -C "$workspace" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+node_version=$(node --version 2>/dev/null || echo "unknown")
 
-context="Session context: branch=$branch, uncommitted_files=$dirty_count, node=$node_version"
+context="[Session Context] Workspace: $workspace | Branch: $branch | Uncommitted Files: $dirty_count | Node: $node_version"
 
-# Inject as system message — the agent sees this as background context
-echo "{\"systemMessage\":\"$context\"}"
+# Return injectSteps with ephemeralMessage per official Antigravity schema
+echo "{\"injectSteps\":[{\"ephemeralMessage\":\"$context\"}]}"

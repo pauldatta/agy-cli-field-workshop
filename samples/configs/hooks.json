@@ -1,0 +1,42 @@
+{
+  "security-gate": {
+    "enabled": true,
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.agents/hooks/secret-scanner.sh",
+            "timeout": 5
+          }
+        ]
+      }
+      ]
+  },
+  "session-context-injector": {
+    "enabled": true,
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "./.agents/hooks/session-context.sh",
+        "timeout": 5
+      }
+    ]
+  },
+  "tool-telemetry": {
+    "enabled": true,
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.agents/hooks/test-nudge.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

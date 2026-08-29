@@ -118,34 +118,37 @@ cat > .agents/mcp_config.json << 'EOF'
 EOF
 ```
 
-### Step 3: Rewrite hook event names in settings.json
+### Step 3: Migrate hooks to .agents/hooks.json
 
-```json
+```bash
+# AGY configures lifecycle hooks in .agents/hooks.json with renamed events:
+cat > .agents/hooks.json << 'EOF'
 {
-  "hooks": {
+  "session-context": {
     "PreInvocation": [
       {
-        "hooks": [{
-          "name": "session-context",
-          "type": "command",
-          "command": "$AGY_PROJECT_DIR/.agents/hooks/session-context.sh",
-          "timeout": 3000
-        }]
+        "type": "command",
+        "command": "$AGY_PROJECT_DIR/.agents/hooks/session-context.sh",
+        "timeout": 5
       }
-    ],
+    ]
+  },
+  "secret-scanner": {
     "PreToolUse": [
       {
-        "matcher": "write_file|edit",
-        "hooks": [{
-          "name": "secret-scanner",
-          "type": "command",
-          "command": "$AGY_PROJECT_DIR/.agents/hooks/secret-scanner.sh",
-          "timeout": 2000
-        }]
+        "matcher": "write_to_file|replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$AGY_PROJECT_DIR/.agents/hooks/secret-scanner.sh",
+            "timeout": 5
+          }
+        ]
       }
     ]
   }
 }
+EOF
 ```
 
 ### Step 4: Update binary references

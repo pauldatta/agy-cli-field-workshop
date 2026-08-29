@@ -289,64 +289,78 @@ description: >
 
 ## 2.5 — Hooks: Automated Guardrails <span class="duration-badge">10 min</span>
 
-For enterprise migrations, you want automated gates — not just manual review. Hooks fire on CLI events and can block, warn, or log tool use before it happens.
+For enterprise migrations, you want automated gates — not just manual review. Hooks fire on CLI lifecycle events and can block, warn, or log tool calls before and after execution.
 
 ### Pre-Tool Hook: Block Writes Outside Migration Scope
 
 Create `.agents/hooks/scope-guard.sh`:
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 # AGY CLI hook event: PreToolUse
-# Blocks writes to files outside the current migration module
+# Blocks file modifications outside migration module
 
-TOOL_NAME="$1"
-FILE_PATH="$2"
-MIGRATION_MODULE="${MIGRATION_MODULE:-src/auth}"  # Set before starting each phase
+input=$(cat)
+filepath=$(echo "$input" | jq -r '.toolCall.args.TargetFile // ""')
+migration_module="${MIGRATION_MODULE:-src/auth}"
 
-if [[ "$TOOL_NAME" == "write_file" || "$TOOL_NAME" == "edit" ]]; then
-  if [[ "$FILE_PATH" != *"$MIGRATION_MODULE"* ]]; then
-    echo "BLOCK: Write to $FILE_PATH is outside migration scope ($MIGRATION_MODULE)" >&2
-    exit 1  # Non-zero exit blocks the tool call
-  fi
+if [ -n "$filepath" ] && [[ "$filepath" != *"$migration_module"* ]]; then
+  echo "{\"decision\":\"deny\",\"reason\":\"File write to $filepath is outside active migration module ($migration_module)\"}"
+else
+  echo '{"decision":"allow"}'
 fi
 ```
 
-Register in `settings.json`:
+Make it executable:
+
+```bash
+chmod +x .agents/hooks/scope-guard.sh
+```
+
+Register in `.agents/hooks.json`:
 
 ```json
 {
-  "hooks": {
+  "scope-guard": {
     "PreToolUse": [
       {
-        "matcher": "write_file|edit",
-        "command": ".agents/hooks/scope-guard.sh"
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.agents/hooks/scope-guard.sh",
+            "timeout": 5
+          }
+        ]
       }
     ]
   }
 }
 ```
 
-### Post-Tool Hook: Auto-Run Tests After Every File Write
+### Post-Tool Hook: Diagnostic Telemetry After File Writes
+
+Create `.agents/hooks/test-logger.sh`:
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 # AGY CLI hook event: PostToolUse
-# Runs tests automatically after every source file write
+# Logs diagnostic telemetry if a tool execution encounters an error
 
-TOOL_NAME="$1"
-FILE_PATH="$2"
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.toolCall.name // ""')
+tool_error=$(echo "$input" | jq -r '.error // ""')
 
-if [[ "$TOOL_NAME" == "write_file" && "$FILE_PATH" == *".java" ]]; then
-  echo "Running test gate after $FILE_PATH was modified..."
-  mvn test -pl "$(dirname $FILE_PATH | sed 's|src/main/java||')" -q 2>&1
-  if [[ $? -ne 0 ]]; then
-    echo "⚠️  Tests failed after writing $FILE_PATH — consider /rewind"
-  fi
+if [ -n "$tool_error" ]; then
+  mkdir -p .agents/logs
+  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Error in $tool_name: $tool_error" >> .agents/logs/migration_errors.log
 fi
+
+# PostToolUse output contract is strictly an empty JSON object
+echo '{}'
 ```
 
-> 📖 Source: [Hooks](https://antigravity.google/docs/hooks)
+> 📖 Source: [Hooks docs](https://antigravity.google/docs/hooks)
 
 ---
 

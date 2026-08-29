@@ -286,11 +286,25 @@ Official source: [Antigravity Subagents](https://antigravity.google/docs/subagen
 
 ---
 
+## 12. Lifecycle Hooks & Governance (`devops-automation.md`, `ex16_custom_hooks_and_safety_gates.md`)
+
+Official source: [Antigravity Hooks](https://antigravity.google/docs/hooks)
+
+| # | Claim | Official Source |
+|:--|:------|:---|
+| 12.1 | Lifecycle hooks are configured in `.agents/hooks.json` (workspace) or `~/.gemini/config/hooks.json` (global) mapping hook names to event handler arrays. | [Hooks](https://antigravity.google/docs/hooks) |
+| 12.2 | Hook scripts receive structured JSON on stdin containing `workspacePaths`, `conversationId`, `transcriptPath`, `modelName`, `toolCall`, `stepIdx`, and `invocationNum`. | [Hooks](https://antigravity.google/docs/hooks) |
+| 12.3 | `PreToolUse` hooks return JSON on stdout with required `decision` (`"allow"`, `"deny"`, `"ask"`, `"force_ask"`) and optional `reason`. | [Hooks](https://antigravity.google/docs/hooks) |
+| 12.4 | `PreInvocation` and `PostInvocation` hooks inject ephemeral messages, user messages, or tool calls into the trajectory via `{"injectSteps": [...]}`. | [Hooks](https://antigravity.google/docs/hooks) |
+| 12.5 | `Stop` hooks can intercept session completion and re-enter the execution loop with `{"decision": "continue", "reason": "..."}`. | [Hooks](https://antigravity.google/docs/hooks) |
+
+---
+
 ## Summary
 
 | Count | Category |
 |:---:|:---|
-| 125 | Claims confirmed against official Antigravity CLI documentation |
+| 130 | Claims confirmed against official Antigravity CLI documentation |
 | 3 | Workshop-original pedagogical patterns (`/btw`, "Propose, Review, Apply", "Pre-Commit Review") |
 
 ---

@@ -6,6 +6,19 @@ Content-specific changes to workshop materials — CLI breakages, deprecated com
 
 ## 2026-08-29
 
+### 🪝 Lifecycle Hooks & Enterprise Safety Gates Upgrade
+
+**Affects:** `samples/hooks/`, `samples/configs/hooks.json`, `docs/devops-automation.md`, `docs/legacy-modernization.md`, `docs/exercises/ex16_custom_hooks_and_safety_gates.md`, `AUDIT.md`
+
+- **Official JSON stdin/stdout Contract Compliance:**
+  - Refactored all `samples/hooks/*.sh` (`secret-scanner.sh`, `session-context.sh`, `git-context-injector.sh`, `test-nudge.sh`) to parse JSON from stdin using `.toolCall.args.CodeContent // .toolCall.args.ReplacementContent // .toolCall.args.CommandLine` and `.workspacePaths[0]`.
+  - Conformed stdout responses strictly to official event schemas: `PreToolUse` (`{"decision": "allow" | "deny", "reason": "..."}`), `PreInvocation` (`{"injectSteps": [{"ephemeralMessage": "..."}]}`), and `PostToolUse` (`{}`).
+- **Canonical Configuration Schema:**
+  - Added `samples/configs/hooks.json` mapping hook names to event handlers (`PreToolUse`, `PostToolUse`, `PreInvocation`) with regex matchers and timeout in integer seconds.
+  - Fixed documentation across `devops-automation.md`, `legacy-modernization.md`, and `ex07_migration_walkthrough.md`.
+- **New Exercise 16 (`ex16_custom_hooks_and_safety_gates.md`):**
+  - Hands-on lab implementing a `PreToolUse` destructive command guard, `PreInvocation` ephemeral git context injector, and `.agents/hooks.json` verification.
+
 ### 🤖 Custom Subagents & Multi-Agent Orchestration Upgrade
 
 **Affects:** `docs/multi-agent-advanced.md`, `docs/exercises/ex04_subagents.md`, `exercises/ex04_subagents.md`, `samples/agents/`, `AUDIT.md`

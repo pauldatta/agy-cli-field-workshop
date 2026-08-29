@@ -1,22 +1,25 @@
 #!/usr/bin/env bash
-# PreToolUse hook: Lightweight secret detection in file writes
-# Matcher: write_file|edit
-# Performance: <50ms — simple regex, no external calls
+# PreToolUse hook: Lightweight secret detection in file writes and command executions
+# Matcher: write_to_file|replace_file_content|multi_replace_file_content|run_command
+# Performance: <50ms — simple regex over stdin JSON
 #
-# PURPOSE: Prevents the agent from writing hardcoded credentials.
-# This steers the model toward using env vars instead of
-# embedding secrets directly in code.
-#
+# PURPOSE: Enforces enterprise security policy by blocking hardcoded credentials.
 # AGY CLI hook event: PreToolUse
-# Register in: .agents/hooks.json or settings.json under "PreToolUse"
-# Tool names for matcher: write_file, edit (AGY uses "edit" not "replace_in_file")
+# Register in: .agents/hooks.json under "PreToolUse"
 
 input=$(cat)
-content=$(echo "$input" | jq -r '.tool_input.content // .tool_input.new_string // ""' 2>/dev/null)
 
-# Quick regex scan — no network calls, no disk I/O beyond stdin
+# Extract content from write_to_file, replace_file_content, or run_command
+content=$(echo "$input" | jq -r '
+  .toolCall.args.CodeContent // 
+  .toolCall.args.ReplacementContent // 
+  (.toolCall.args.ReplacementChunks[]?.ReplacementContent) // 
+  .toolCall.args.CommandLine // 
+  ""' 2>/dev/null)
+
+# Quick regex scan for API keys, tokens, and hardcoded passwords
 if echo "$content" | grep -qEi '(AKIA[0-9A-Z]{16}|ghp_[a-zA-Z0-9]{36}|sk-[a-zA-Z0-9]{48}|password\s*[:=]\s*["'"'"'][^\s"]{8,})'; then
-    echo '{"decision":"deny","reason":"Hardcoded credential detected. Use environment variables instead. Store secrets in .env (gitignored) and access them via process.env.YOUR_SECRET_NAME."}'
+    echo '{"decision":"deny","reason":"Hardcoded credential detected. Store secrets in environment variables or .env (gitignored) and access them via process.env or os.environ."}'
 else
-    echo '{}'
+    echo '{"decision":"allow"}'
 fi

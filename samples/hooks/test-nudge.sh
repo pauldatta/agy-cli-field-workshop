@@ -1,27 +1,23 @@
 #!/usr/bin/env bash
-# PostToolUse hook: Lightweight post-write reminder
-# Matcher: write_file|edit
-# Performance: <10ms — no external calls, pure string output
+# PostToolUse hook: Telemetry & audit logging after tool execution
+# Matcher: write_to_file|replace_file_content|run_command
+# Performance: <10ms — writes diagnostic trace if error occurs
 #
-# PURPOSE: After file writes to source paths, nudge the agent
-# to consider running tests. This steers behavior without
-# actually running tests (which adds latency). The agent
-# decides whether to act on the nudge.
-#
+# PURPOSE: Logs failed tool executions or changes for offline auditing.
 # AGY CLI hook event: PostToolUse
-# Register in: .agents/hooks.json or settings.json under "PostToolUse"
-# Tool names for matcher: write_file, edit (AGY uses "edit" not "replace_in_file")
+# Register in: .agents/hooks.json under "PostToolUse"
 
 input=$(cat)
-filepath=$(echo "$input" | jq -r '.tool_input.file_path // .tool_input.path // ""' 2>/dev/null)
 
-# Nudge for source files — remind the agent about tests
-if echo "$filepath" | grep -qE '\.(js|ts|jsx|tsx|py|go)$'; then
-    if echo "$filepath" | grep -qvE '(test|spec|__tests__)'; then
-        echo "{\"systemMessage\":\"Reminder: you modified a source file. Consider running tests to verify no regressions.\"}"
-    else
-        echo '{}'
-    fi
-else
-    echo '{}'
+tool_name=$(echo "$input" | jq -r '.toolCall.name // ""' 2>/dev/null)
+step_idx=$(echo "$input" | jq -r '.stepIdx // 0' 2>/dev/null)
+tool_error=$(echo "$input" | jq -r '.error // ""' 2>/dev/null)
+
+# If tool execution produced an error, record telemetry to audit log
+if [ -n "$tool_error" ]; then
+    mkdir -p .agents/logs
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Step $step_idx ($tool_name) failed: $tool_error" >> .agents/logs/tool_audit.log
 fi
+
+# PostToolUse output contract is strictly an empty JSON object
+echo '{}'

@@ -1,38 +1,38 @@
-# Modul 2: Modernisasi Basis Kode Legacy
+# Module 2: Legacy Codebase Modernization
 
 <div class="module-header" markdown>
-**Durasi:** ~75 menit  
-**Tujuan:** Memigrasikan aplikasi legacy dengan aman menggunakan primitif Antigravity CLI — pembatasan izin yang ketat, self-onboarding agen, analisis sub-agen paralel, hook sebagai pagar pengaman, dan `/rewind` sebagai jaring pengaman Anda.  
-**PRD Latihan:** [Modernisasi .NET](exercises/ex08_dotnet_modernization.md) · [Pembaruan Java](exercises/ex09_java_upgrade.md)
+**Duration:** ~75 minutes  
+**Goal:** Migrate a legacy application safely using Antigravity CLI primitives — strict permissions gating, agent self-onboarding, parallel subagent analysis, hooks as guardrails, and `/rewind` as your safety net.  
+**Exercise PRDs:** [.NET Modernization](exercises/ex08_dotnet_modernization.md) · [Java Upgrade](exercises/ex09_java_upgrade.md)
 </div>
 
-> 📖 Sumber: [Izin](https://antigravity.google/docs/permissions) · [Mode Ketat](https://antigravity.google/docs/strict-mode) · [Sub-agen](https://antigravity.google/docs/subagents) · [Skill](https://antigravity.google/docs/skills) · [Hook](https://antigravity.google/docs/hooks) · [cli-features](https://antigravity.google/docs/cli-features) · [cli-using](https://antigravity.google/docs/cli-using)
+> 📖 Sources: [Permissions](https://antigravity.google/docs/permissions) · [Strict Mode](https://antigravity.google/docs/strict-mode) · [Subagents](https://antigravity.google/docs/subagents) · [Skills](https://antigravity.google/docs/skills) · [Hooks](https://antigravity.google/docs/hooks) · [cli-features](https://antigravity.google/docs/cli-features) · [cli-using](https://antigravity.google/docs/cli-using)
 
 ---
 
-## Mengapa Modernisasi Legacy Itu Sulit
+## Why Legacy Modernization Is Hard
 
-Risiko dalam migrasi besar bukanlah perubahan kode — melainkan **hal-hal yang tidak diketahui**. Anda tidak tahu apa yang akan Anda rusak sampai hal itu benar-benar rusak. Tiga mode kegagalan tersebut adalah:
+The risk in large migrations isn't the code changes — it's the **unknowns**. You don't know what you'll break until it's broken. The three failure modes are:
 
-1. **Pelebaran ruang lingkup** — agen memfaktorkan ulang hal-hal yang tidak Anda minta untuk disentuh
-2. **Keruntuhan konteks** — setelah sesi yang panjang, agen kehilangan jejak batasan migrasi Anda
-3. **Tidak ada rollback** — perubahan yang salah merambat sebelum Anda dapat menghentikannya
+1. **Scope creep** — the agent refactors things you didn't ask it to touch
+2. **Context collapse** — after a long session, the agent loses track of your migration constraints
+3. **No rollback** — a wrong change cascades before you can stop it
 
-Primitif AGY mengatasi ketiganya secara langsung.
+AGY's primitives address all three directly.
 
 ---
 
-## 2.1 — Izin Ketat: Baca Sebelum Anda Menulis <span class="duration-badge">15 min</span>
+## 2.1 — Strict Permissions: Read Before You Write <span class="duration-badge">15 min</span>
 
-Padanan AGY untuk "Mode Perencanaan" adalah **izin ketat** — sebuah gerbang keras yang menolak semua penulisan file dan perintah shell sampai Anda secara eksplisit mengizinkannya.
+The AGY equivalent of "Plan Mode" is **strict permissions** — a hard gate that denies all file writes and shell commands until you explicitly permit them.
 
-### Kunci Sebelum Anda Menjelajah
+### Lock Down Before You Explore
 
 ```bash
 /permissions
 ```
 
-Atur level ke `strict`:
+Set the level to `strict`:
 
 ```bash
 # In the permissions dialog, select: strict
@@ -47,13 +47,13 @@ Atur level ke `strict`:
 }
 ```
 
-Dalam mode `strict`, agen dapat membaca file, mencari di web, dan menalar — tetapi **tidak dapat menulis, menghapus, atau mengeksekusi apa pun**. Ini adalah dinding keras, bukan prompt lunak.
+In `strict` mode the agent can read files, search the web, and reason — but **cannot write, delete, or execute anything**. It's a hard wall, not a soft prompt.
 
-> 📖 Sumber: [Mode Ketat](https://antigravity.google/docs/strict-mode) · [Izin](https://antigravity.google/docs/permissions)
+> 📖 Source: [Strict Mode](https://antigravity.google/docs/strict-mode) · [Permissions](https://antigravity.google/docs/permissions)
 
-### Sekarang Selidiki dengan Bebas
+### Now Investigate Freely
 
-Dengan penulisan terkunci, beri agen mandat membaca tanpa batas:
+With writes locked, give the agent an unconstrained read mandate:
 
 ```text
 Analyze this entire codebase for a migration. Map:
@@ -65,42 +65,42 @@ Analyze this entire codebase for a migration. Map:
 6. Migration risks ordered by severity
 ```
 
-> **Apa yang terjadi:** Agen membaca setiap file yang dibutuhkannya, melacak impor dan rantai panggilan, dan membangun model mental — semuanya dengan nol risiko modifikasi. Ini adalah fase pengintaian Anda.
+> **What's happening:** The agent reads every file it needs, traces imports and call chains, and builds a mental model — all with zero risk of modification. This is your reconnaissance phase.
 
-### Tinjau Rencana di Editor Anda
+### Review the Plan in Your Editor
 
-Setelah agen menghasilkan rencana migrasi, buka di editor Anda untuk menyempurnakannya:
+Once the agent produces a migration plan, open it in your editor to refine it:
 
 ```text
 ctrl+g
 ```
 
-Ini akan membawa Anda ke `$EDITOR` dengan output agen saat ini. Edit batasan, tambahkan persyaratan khusus tim, coret ruang lingkup yang tidak Anda inginkan. Agen akan menggabungkan hasil edit Anda saat Anda menyimpan dan keluar.
+This drops you into `$EDITOR` with the current agent output. Edit constraints, add team-specific requirements, strike out scope you don't want. The agent incorporates your edits when you save and exit.
 
-> 📖 Sumber: [cli-using — Keybindings](https://antigravity.google/docs/cli-using) — uid 3_276–3_280: "Edit prompt di dalam editor shell default Anda"
+> 📖 Source: [cli-using — Keybindings](https://antigravity.google/docs/cli-using) — uid 3_276–3_280: "Edit prompt inside your default shell editor"
 
-### Buka Kunci Penulisan — Tetapi Hanya untuk Apa yang Anda Setujui
+### Unlock Writes — But Only for What You Approved
 
-Setelah rencana disetujui, pulihkan akses tulis secara selektif:
+Once the plan is signed off, restore write access selectively:
 
 ```bash
 /permissions
 # Select: request-review
 ```
 
-Dalam mode `request-review`, agen meminta persetujuan sebelum setiap penulisan atau perintah shell. Anda melihat dengan tepat apa yang ingin dilakukannya sebelum ia melakukannya.
+In `request-review` mode, the agent asks for approval before every write or shell command. You see exactly what it wants to do before it does it.
 
-> **Alurnya:** `strict` (selidiki) → setujui rencana → `request-review` (eksekusi dengan pengawasan) → `always-proceed` hanya untuk langkah akhir yang tepercaya dan teruji dengan baik.
+> **The flow:** `strict` (investigate) → approve plan → `request-review` (execute with oversight) → `always-proceed` only for trusted, well-tested final steps.
 
 ---
 
-## 2.2 — AGENTS.md: Mengodekan Standar Migrasi <span class="duration-badge">10 min</span>
+## 2.2 — AGENTS.md: Encoding Migration Standards <span class="duration-badge">10 min</span>
 
-Konteks menghilang selama sesi yang panjang. AGENTS.md adalah cara Anda mencegahnya — ini disuntikkan ke setiap sesi secara otomatis, tidak peduli seberapa lama percakapan berlangsung.
+Context collapses over long sessions. AGENTS.md is how you prevent it — it's injected into every session automatically, no matter how long the conversation runs.
 
-### Orientasi Mandiri Agen
+### Agent Self-Onboarding
 
-Pola yang paling kuat adalah meminta agen **menulis AGENTS.md-nya sendiri** dari apa yang ditemukannya selama investigasi. Ini mengodekan apa yang dipelajarinya sebagai pagar pengaman untuk pekerjaannya sendiri selanjutnya.
+The most powerful pattern is having the agent **write its own AGENTS.md** from what it found during investigation. It encodes what it learned as guardrails for its own subsequent work.
 
 ```text
 Based on your codebase analysis, write an AGENTS.md that:
@@ -117,11 +117,11 @@ Based on your codebase analysis, write an AGENTS.md that:
 Write this to AGENTS.md in the project root.
 ```
 
-> **Mengapa orientasi mandiri berfungsi:** Agen menulis instruksi untuk dirinya sendiri. Setiap keputusan migrasi yang dibuatnya dari titik ini ke depan diperiksa terhadap batasan yang ditulisnya. Ini adalah loop yang memperkuat dirinya sendiri — konteks yang lebih baik menghasilkan perubahan yang lebih baik, yang memunculkan lebih banyak pola, yang meningkatkan konteks.
+> **Why self-onboarding works:** The agent is writing instructions for itself. Every migration decision it makes from this point forward is checked against constraints it authored. This is a self-reinforcing loop — better context produces better changes, which surface more patterns, which improve context.
 
-### Konteks Modular dengan Impor @file
+### Modular Context with @file Imports
 
-Untuk proyek besar, jaga agar AGENTS.md tetap ringkas dan impor spesifikasi terperinci:
+For large projects, keep AGENTS.md lean and import detailed specs:
 
 ```markdown
 # AGENTS.md
@@ -131,11 +131,11 @@ Untuk proyek besar, jaga agar AGENTS.md tetap ringkas dan impor spesifikasi terp
 @./docs/migration/phase-1-checklist.md
 ```
 
-> 📖 Sumber: [cli-using](https://antigravity.google/docs/cli-using) — sintaks impor AGENTS.md
+> 📖 Source: [cli-using](https://antigravity.google/docs/cli-using) — AGENTS.md import syntax
 
-### Berkas Aturan untuk Batasan Ketat
+### Rules Files for Hard Constraints
 
-Untuk persyaratan yang tidak dapat dinegosiasikan, gunakan `.agents/rules.md` — ini disuntikkan sebagai arahan prompt sistem, bukan hanya konteks:
+For non-negotiable requirements, use `.agents/rules.md` — these are injected as system prompt directives, not just context:
 
 ```markdown
 # .agents/rules.md
@@ -146,15 +146,15 @@ Untuk persyaratan yang tidak dapat dinegosiasikan, gunakan `.agents/rules.md` �
 - ALWAYS commit with message format: "migrate(phase-N): <description>"
 ```
 
-> 📖 Sumber: [cli-using](https://antigravity.google/docs/cli-using) — arahan prompt sistem `.agents/rules.md`
+> 📖 Source: [cli-using](https://antigravity.google/docs/cli-using) — `.agents/rules.md` system prompt directives
 
 ---
 
-## 2.3 — Sub-agen: Tim Analisis Paralel <span class="duration-badge">15 min</span>
+## 2.3 — Subagents: Parallel Analysis Teams <span class="duration-badge">15 min</span>
 
-Migrasi besar memiliki beberapa masalah independen — keamanan, performa, kontrak API, cakupan pengujian. Menjalankannya secara berurutan akan lambat dan membuang jendela konteks agen. Gunakan sub-agen untuk memparalelkannya.
+Large migrations have multiple independent concerns — security, performance, API contracts, test coverage. Running them sequentially is slow and wastes the agent's context window. Use subagents to parallelize.
 
-### Membuat Tim Analisis Paralel
+### Spawn a Parallel Analysis Team
 
 ```text
 I need three parallel analyses before we start migrating. Please spawn:
@@ -172,31 +172,31 @@ I need three parallel analyses before we start migrating. Please spawn:
 Run all three concurrently. I'll review the reports before we start Phase 1.
 ```
 
-### Memantau dari Panel Sub-agen
+### Monitor from the Subagents Panel
 
 ```bash
 /agents
 ```
 
-Panel ini menunjukkan semua sub-agen yang sedang berjalan dengan status: `running`, `done`, `killed`. Perhatikan ketiganya selesai secara bersamaan.
+The panel shows all running subagents with status: `running`, `done`, `killed`. Watch all three finish simultaneously.
 
 ```text
-ctrl+j
+alt+j
 ```
 
-Menteleportasi Anda ke sub-agen berikutnya yang menunggu persetujuan Anda — berguna jika salah satunya mencapai batas izin dan membutuhkan persetujuan.
+Teleports you to the next subagent waiting for your approval — useful if one hits a permission boundary and needs a go-ahead.
 
 ```text
 ctrl+k
 ```
 
-Menyetujui dengan cepat permintaan izin sub-agen dari percakapan utama tanpa meninggalkan konteks Anda saat ini.
+Fast-approve a subagent permission request from the main conversation without leaving your current context.
 
-> 📖 Sumber: [cli-features — Sub-agen](https://antigravity.google/docs/cli-features) — uid 5_278–5_316
+> 📖 Source: [cli-features — Subagents](https://antigravity.google/docs/cli-features) — uid 5_278–5_316
 
-### Definisi Sub-agen Kustom
+### Custom Subagent Definition
 
-Buat pemindai keamanan read-only di `.agents/agents/security-scanner.md`:
+Create a read-only security scanner in `.agents/agents/security-scanner.md`:
 
 ```markdown
 ---
@@ -224,27 +224,27 @@ Always report: file path, line number, severity (HIGH/MEDIUM/LOW), and remediati
 Never modify any file. Never execute any command.
 ```
 
-> 📖 Sumber: [Sub-agen](https://antigravity.google/docs/subagents) · [cli-features](https://antigravity.google/docs/cli-features) — uid 5_274: format JSON izin terperinci
+> 📖 Source: [Subagents](https://antigravity.google/docs/subagents) · [cli-features](https://antigravity.google/docs/cli-features) — uid 5_274: fine-grained permissions JSON format
 
 ---
 
-## 2.4 — Skill: Keahlian Migrasi yang Dapat Digunakan Kembali <span class="duration-badge">10 min</span>
+## 2.4 — Skills: Reusable Migration Expertise <span class="duration-badge">10 min</span>
 
-Skill adalah kumpulan instruksi yang dibaca dan diaktifkan oleh agen saat relevan. Untuk migrasi yang berulang (Java 8→21, .NET Framework→.NET 8, Express→Fastify), enkodekan pola tersebut sekali sebagai sebuah skill.
+Skills are instruction sets the agent reads and activates when relevant. For repeatable migrations (Java 8→21, .NET Framework→.NET 8, Express→Fastify), encode the pattern once as a skill.
 
-### Telusuri Skill yang Tersedia
+### Browse Available Skills
 
 ```bash
 /skills
 ```
 
-### Buat Skill Migrasi
+### Create a Migration Skill
 
 ```bash
 mkdir -p ~/.gemini/antigravity-cli/skills/java-migration
 ```
 
-Buat `~/.gemini/antigravity-cli/skills/java-migration/SKILL.md`:
+Create `~/.gemini/antigravity-cli/skills/java-migration/SKILL.md`:
 
 ```markdown
 ---
@@ -283,112 +283,126 @@ description: >
 **Validation:** All tests pass with new config loading path.
 ```
 
-> 📖 Sumber: [Skill](https://antigravity.google/docs/skills) · [cli-features — /skills](https://antigravity.google/docs/cli-features) — uid 5_251–5_253
+> 📖 Source: [Skills](https://antigravity.google/docs/skills) · [cli-features — /skills](https://antigravity.google/docs/cli-features) — uid 5_251–5_253
 
 ---
 
-## 2.5 — Hook: Pagar Pengaman Otomatis <span class="duration-badge">10 min</span>
+## 2.5 — Hooks: Automated Guardrails <span class="duration-badge">10 min</span>
 
-Untuk migrasi enterprise, Anda menginginkan gerbang otomatis — bukan hanya peninjauan manual. Hook terpicu pada peristiwa CLI dan dapat memblokir, memperingatkan, atau mencatat penggunaan alat sebelum itu terjadi.
+For enterprise migrations, you want automated gates — not just manual review. Hooks fire on CLI lifecycle events and can block, warn, or log tool calls before and after execution.
 
-### Hook Pra-Alat: Blokir Penulisan di Luar Cakupan Migrasi
+### Pre-Tool Hook: Block Writes Outside Migration Scope
 
-Buat `.agents/hooks/scope-guard.sh`:
+Create `.agents/hooks/scope-guard.sh`:
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 # AGY CLI hook event: PreToolUse
-# Blocks writes to files outside the current migration module
+# Blocks file modifications outside migration module
 
-TOOL_NAME="$1"
-FILE_PATH="$2"
-MIGRATION_MODULE="${MIGRATION_MODULE:-src/auth}"  # Set before starting each phase
+input=$(cat)
+filepath=$(echo "$input" | jq -r '.toolCall.args.TargetFile // ""')
+migration_module="${MIGRATION_MODULE:-src/auth}"
 
-if [[ "$TOOL_NAME" == "write_file" || "$TOOL_NAME" == "edit" ]]; then
-  if [[ "$FILE_PATH" != *"$MIGRATION_MODULE"* ]]; then
-    echo "BLOCK: Write to $FILE_PATH is outside migration scope ($MIGRATION_MODULE)" >&2
-    exit 1  # Non-zero exit blocks the tool call
-  fi
+if [ -n "$filepath" ] && [[ "$filepath" != *"$migration_module"* ]]; then
+  echo "{\"decision\":\"deny\",\"reason\":\"File write to $filepath is outside active migration module ($migration_module)\"}"
+else
+  echo '{"decision":"allow"}'
 fi
 ```
 
-Daftarkan di `settings.json`:
+Make it executable:
+
+```bash
+chmod +x .agents/hooks/scope-guard.sh
+```
+
+Register in `.agents/hooks.json`:
 
 ```json
 {
-  "hooks": {
+  "scope-guard": {
     "PreToolUse": [
       {
-        "matcher": "write_file|edit",
-        "command": ".agents/hooks/scope-guard.sh"
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.agents/hooks/scope-guard.sh",
+            "timeout": 5
+          }
+        ]
       }
     ]
   }
 }
 ```
 
-### Hook Pasca-Alat: Jalankan Otomatis Pengujian Setelah Setiap Penulisan Berkas
+### Post-Tool Hook: Diagnostic Telemetry After File Writes
+
+Create `.agents/hooks/test-logger.sh`:
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 # AGY CLI hook event: PostToolUse
-# Runs tests automatically after every source file write
+# Logs diagnostic telemetry if a tool execution encounters an error
 
-TOOL_NAME="$1"
-FILE_PATH="$2"
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.toolCall.name // ""')
+tool_error=$(echo "$input" | jq -r '.error // ""')
 
-if [[ "$TOOL_NAME" == "write_file" && "$FILE_PATH" == *".java" ]]; then
-  echo "Running test gate after $FILE_PATH was modified..."
-  mvn test -pl "$(dirname $FILE_PATH | sed 's|src/main/java||')" -q 2>&1
-  if [[ $? -ne 0 ]]; then
-    echo "⚠️  Tests failed after writing $FILE_PATH — consider /rewind"
-  fi
+if [ -n "$tool_error" ]; then
+  mkdir -p .agents/logs
+  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Error in $tool_name: $tool_error" >> .agents/logs/migration_errors.log
 fi
+
+# PostToolUse output contract is strictly an empty JSON object
+echo '{}'
 ```
 
-> 📖 Sumber: [Hook](https://antigravity.google/docs/hooks)
+> 📖 Source: [Hooks docs](https://antigravity.google/docs/hooks)
 
 ---
 
-## 2.6 — /rewind dan /fork: Jaring Pengaman Anda <span class="duration-badge">5 min</span>
+## 2.6 — /rewind and /fork: Your Safety Net <span class="duration-badge">5 min</span>
 
-### /rewind — Memutar Kembali Percakapan
+### /rewind — Roll Back the Conversation
 
-Jika agen keluar jalur, Anda tidak perlu memulai dari awal. `/rewind` memutar kembali riwayat percakapan:
+If the agent goes off-track, you don't need to start over. `/rewind` rolls back conversation history:
 
 ```bash
 /rewind
 ```
 
-Ini akan membuka pemilih riwayat. Pilih giliran untuk dikembalikan. Pemahaman agen tentang basis kode akan diatur ulang ke titik tersebut — berguna jika ia telah mengumpulkan asumsi yang salah selama sesi yang panjang.
+This opens a history picker. Select the turn to revert to. The agent's understanding of the codebase resets to that point — useful if it's accumulated incorrect assumptions during a long session.
 
-> 📖 Sumber: [cli-features](https://antigravity.google/docs/cli-features) — uid 5_220–5_226: "`/rewind` (alias `/undo`) — memutar kembali riwayat percakapan"
+> 📖 Source: [cli-features](https://antigravity.google/docs/cli-features) — uid 5_220–5_226: "`/rewind` (alias `/undo`) — roll back conversation history"
 
-### /fork — Eksplorasi Tanpa Risiko
+### /fork — Explore Without Risk
 
-Sebelum mencoba langkah migrasi yang berisiko, fork percakapan tersebut:
+Before attempting a risky migration step, fork the conversation:
 
 ```bash
 /fork
 ```
 
-Ini akan membuat ruang kerja paralel. Anda dapat mencoba pendekatan berisiko di dalam fork tersebut. Jika berhasil, bagus. Jika tidak, tutup fork dan lanjutkan dari percakapan utama — yang tidak pernah berubah.
+This creates a parallel workspace. You can try the risky approach in the fork. If it works, great. If it doesn't, close the fork and continue from the main conversation — which never changed.
 
-> 📖 Sumber: [cli-using](https://antigravity.google/docs/cli-using) — uid 3_219–3_224: "`/fork` untuk membuat ruang kerja terpisah"
+> 📖 Source: [cli-using](https://antigravity.google/docs/cli-using) — uid 3_219–3_224: "`/fork` to spin up a separate workspace"
 
-### /resume — Melanjutkan Migrasi Panjang
+### /resume — Pick Up Long Migrations
 
-Migrasi besar memakan waktu berhari-hari. Saat Anda kembali:
+Large migrations span multiple days. When you return:
 
 ```bash
 /resume
 ```
 
-Ini akan membuka pemilih sesi yang menampilkan sesi migrasi Anda sebelumnya dengan stempel waktu dan nama percakapan. Pilih sesi yang tepat untuk melanjutkan tepat di tempat Anda tinggalkan.
+This opens a session picker showing your previous migration sessions with timestamps and conversation names. Select the right one to continue exactly where you left off.
 
-> 📖 Sumber: [cli-features](https://antigravity.google/docs/cli-features) — uid 5_213–5_219
+> 📖 Source: [cli-features](https://antigravity.google/docs/cli-features) — uid 5_213–5_219
 
-Ganti nama sesi untuk menjaga agar migrasi tetap teratur:
+Rename sessions to keep migrations organized:
 
 ```bash
 /rename "Java 21 Migration — Phase 2: Jakarta namespace"
@@ -396,9 +410,9 @@ Ganti nama sesi untuk menjaga agar migrasi tetap teratur:
 
 ---
 
-## 2.7 — Mode Cetak: Pipeline Migrasi Non-Interaktif <span class="duration-badge">5 min</span>
+## 2.7 — Print Mode: Non-Interactive Migration Pipeline <span class="duration-badge">5 min</span>
 
-Untuk gerbang CI/CD atau eksekusi migrasi semalaman, gunakan mode cetak untuk menyalurkan tugas migrasi tanpa interaksi:
+For CI/CD gates or overnight migration runs, use print mode to pipe migration tasks without interaction:
 
 ```bash
 # Dry-run: analyze and report issues — no writes
@@ -416,70 +430,70 @@ agy -p "Scan src/auth/ for javax.persistence.* usage" | \
   a step-by-step migration plan with exact sed commands" > migration-plan.md
 ```
 
-> 📖 Sumber: [cli-getting-started](https://antigravity.google/docs/cli-getting-started) — `agy --help`: "-p: Alias pendek untuk --print"
+> 📖 Source: [cli-getting-started](https://antigravity.google/docs/cli-getting-started) — `agy --help`: "-p: Short alias for --print"
 
 ---
 
-## Latihan Praktik
+## Hands-On Exercise
 
 <div class="exercise-card" markdown>
 
-### :material-file-document: Latihan 8: Modernisasi Legacy
+### :material-file-document: Exercise 8: Legacy Modernization
 
-**Berkas:** [`ex08_dotnet_modernization.md`](exercises/ex08_dotnet_modernization.md) · [`ex09_java_upgrade.md`](exercises/ex09_java_upgrade.md)  
-**Durasi:** 45 menit  
-**Tujuan:** Melakukan migrasi penuh menggunakan primitif AGY dari modul ini.
+**Files:** [`ex08_dotnet_modernization.md`](exercises/ex08_dotnet_modernization.md) · [`ex09_java_upgrade.md`](exercises/ex09_java_upgrade.md)  
+**Duration:** 45 min  
+**Objective:** Walk through a full migration using the AGY primitives from this module.
 
-**Pilih jalur Anda:**
+**Choose your track:**
 
-#### Jalur A: Utamakan Rencana (Ketat → Investigasi → Eksekusi)
+#### Track A: Plan-First (Strict → Investigate → Execute)
 
-1. Atur `/permissions` ke `strict` — kunci semua penulisan
-2. Berikan agen mandat investigasi penuh (Bagian 2.1)
-3. Gunakan `ctrl+g` untuk membuka rencana di editor Anda dan tambahkan batasan tim
-4. Tulis AGENTS.md yang mengodekan aturan migrasi (atau minta agen untuk menulisnya)
-5. Tambahkan `.agents/rules.md` dengan hal-hal mutlak yang tidak dapat dinegosiasikan
-6. Beralih ke `request-review` — mulai Fase 1 dengan pengawasan
-7. Gunakan `/rewind` jika agen menyimpang di luar lingkup
-8. Ganti nama sesi: `/rename "Migrasi — Fase 1 selesai"`
+1. Set `/permissions` to `strict` — lock all writes
+2. Give the agent a full investigation mandate (Section 2.1)
+3. Use `ctrl+g` to open the plan in your editor and add team constraints
+4. Write an AGENTS.md encoding the migration rules (or have the agent write it)
+5. Add a `.agents/rules.md` with hard non-negotiables
+6. Switch to `request-review` — begin Phase 1 with oversight
+7. Use `/rewind` if the agent drifts outside scope
+8. Rename the session: `/rename "Migration — Phase 1 complete"`
 
-#### Jalur B: Utamakan Sub-agen (Analisis Paralel → Konteks → Eksekusi)
+#### Track B: Subagent-First (Parallel Analysis → Context → Execute)
 
-1. Buat tiga sub-agen paralel: pemindaian keamanan, peta dependensi, cakupan pengujian
-2. Pantau melalui `/agents` — gunakan `ctrl+j` dan `ctrl+k` untuk persetujuan
-3. Gabungkan laporan mereka ke dalam AGENTS.md (minta agen untuk menyintesisnya)
-4. Instal skill `java-migration` (Bagian 2.4)
-5. Gunakan `/fork` sebelum langkah paling berisiko — coba di sana terlebih dahulu
-6. Gunakan mode cetak untuk menghasilkan laporan pasca-fase
+1. Spawn three parallel subagents: security scan, dependency map, test coverage
+2. Monitor via `/agents` — use `alt+j` and `ctrl+k` for approvals
+3. Aggregate their reports into an AGENTS.md (have the agent synthesize)
+4. Install the `java-migration` skill (Section 2.4)
+5. Use `/fork` before the riskiest step — try it there first
+6. Use print mode to generate a post-phase report
 
 </div>
 
 ---
 
-## Ringkasan: Primitif AGY untuk Modernisasi Legacy
+## Summary: AGY Primitives for Legacy Modernization
 
-| Primitif | Apa yang Dilakukannya | Kapan Digunakan |
+| Primitive | What It Does | When to Use |
 | :-- | :-- | :-- |
-| `/permissions strict` | Gerbang read-only yang ketat — tidak ada penulisan atau perintah | Fase investigasi |
-| `/permissions request-review` | Agen bertanya sebelum setiap penulisan | Eksekusi terkontrol |
-| `ctrl+g` | Buka rencana di `$EDITOR` untuk pengeditan kolaboratif | Penyempurnaan rencana |
-| **AGENTS.md** | Standar migrasi persisten di seluruh sesi | Selalu — menyandikan batasan |
-| `.agents/rules.md` | Arahan system-prompt yang ketat | Pagar pengaman yang tidak dapat dinegosiasikan |
-| **Sub-agen** | Tim analisis paralel | Investigasi multi-perhatian |
-| `/agents` + `ctrl+j` + `ctrl+k` | Pantau dan setujui pekerjaan sub-agen | Selama eksekusi paralel |
-| **Hooks** (PreToolUse) | Blokir penulisan di luar lingkup migrasi | Pagar pengaman otomatis |
-| **Hooks** (PostToolUse) | Jalankan pengujian otomatis setelah setiap perubahan | Otomatisasi gerbang pengujian |
-| `/rewind` | Kembalikan percakapan jika agen menyimpang | Koreksi arah pertengahan sesi |
-| `/fork` | Coba langkah berisiko di cabang yang terisolasi | Sebelum perubahan berisiko tinggi |
-| `/resume` | Lanjutkan migrasi multi-hari | Kembali ke sesi |
-| `/rename` | Beri label sesi berdasarkan fase | Manajemen sesi |
-| `agy -p` | Pipeline migrasi non-interaktif | Gerbang CI, eksekusi semalaman |
-| **Skills** | Playbook migrasi yang dapat digunakan kembali | Pola migrasi yang dapat diulang |
+| `/permissions strict` | Hard read-only gate — no writes or commands | Investigation phase |
+| `/permissions request-review` | Agent asks before every write | Controlled execution |
+| `ctrl+g` | Open plan in `$EDITOR` for collaborative editing | Plan refinement |
+| **AGENTS.md** | Persistent migration standards across sessions | Always — encode constraints |
+| `.agents/rules.md` | Hard system-prompt directives | Non-negotiable guardrails |
+| **Subagents** | Parallel analysis teams | Multi-concern investigations |
+| `/agents` + `alt+j` + `ctrl+k` | Monitor and approve subagent work | During parallel runs |
+| **Hooks** (PreToolUse) | Block writes outside migration scope | Automated guardrails |
+| **Hooks** (PostToolUse) | Auto-run tests after every change | Test gate automation |
+| `/rewind` | Roll back conversation if agent drifts | Mid-session course correction |
+| `/fork` | Try risky steps in an isolated branch | Before high-risk changes |
+| `/resume` | Pick up multi-day migrations | Returning to a session |
+| `/rename` | Label sessions by phase | Session management |
+| `agy -p` | Non-interactive migration pipeline | CI gates, overnight runs |
+| **Skills** | Reusable migration playbooks | Repeatable migration patterns |
 
 ---
 
-## Langkah Selanjutnya
+## Next Step
 
-→ Lanjutkan ke **[Modul 3: Membangun Agen AGY dengan SDK](agy-sdk.md)**
+→ Continue to **[Module 3: Building AGY Agents with the SDK](agy-sdk.md)**
 
-→ **[Lembar Contekan](cheatsheet.md)** — semua perintah di satu tempat
+→ **[Cheatsheet](cheatsheet.md)** — all commands in one place

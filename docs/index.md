@@ -27,7 +27,7 @@ hide:
 
     Your first Antigravity CLI session. Explain, refactor, test, review — plus autonomous goals (`/goal`), requirements interviews (`/grill-me`), visual diffs, and plugins.
 
-    **75 min** · Exercises: ex01–ex03, ex13, ex14
+    **75 min** · Exercises: ex01–ex03, ex13, ex14, ex16
 
     [:octicons-arrow-right-24: Start Module 1](sdlc-productivity.md)
 

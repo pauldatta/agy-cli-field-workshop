@@ -1,38 +1,38 @@
-# 模块 2：遗留代码库现代化
+# Module 2: Legacy Codebase Modernization
 
 <div class="module-header" markdown>
-**时长：** 约 75 分钟  
-**目标：** 使用 Antigravity CLI 原语安全地迁移遗留应用程序——严格的权限控制、代理自主引导、并行子代理分析、作为护栏的钩子，以及作为安全网的 `/rewind`。  
-**练习 PRD：** [.NET 现代化](exercises/ex08_dotnet_modernization.md) · [Java 升级](exercises/ex09_java_upgrade.md)
+**Duration:** ~75 minutes  
+**Goal:** Migrate a legacy application safely using Antigravity CLI primitives — strict permissions gating, agent self-onboarding, parallel subagent analysis, hooks as guardrails, and `/rewind` as your safety net.  
+**Exercise PRDs:** [.NET Modernization](exercises/ex08_dotnet_modernization.md) · [Java Upgrade](exercises/ex09_java_upgrade.md)
 </div>
 
-> 📖 参考资料：[权限](https://antigravity.google/docs/permissions) · [严格模式](https://antigravity.google/docs/strict-mode) · [子代理](https://antigravity.google/docs/subagents) · [技能](https://antigravity.google/docs/skills) · [钩子](https://antigravity.google/docs/hooks) · [CLI 功能](https://antigravity.google/docs/cli-features) · [CLI 使用](https://antigravity.google/docs/cli-using)
+> 📖 Sources: [Permissions](https://antigravity.google/docs/permissions) · [Strict Mode](https://antigravity.google/docs/strict-mode) · [Subagents](https://antigravity.google/docs/subagents) · [Skills](https://antigravity.google/docs/skills) · [Hooks](https://antigravity.google/docs/hooks) · [cli-features](https://antigravity.google/docs/cli-features) · [cli-using](https://antigravity.google/docs/cli-using)
 
 ---
 
-## 为什么遗留系统现代化如此困难
+## Why Legacy Modernization Is Hard
 
-大型迁移的风险不在于代码更改，而在于**未知因素**。在东西被破坏之前，你根本不知道会破坏什么。三种失败模式是：
+The risk in large migrations isn't the code changes — it's the **unknowns**. You don't know what you'll break until it's broken. The three failure modes are:
 
-1. **范围蔓延** — 代理重构了你没有要求它触碰的东西
-2. **上下文崩溃** — 在长时间的会话后，代理会丢失对你迁移约束的跟踪
-3. **无法回滚** — 错误的更改在你能够阻止它之前就产生了级联效应
+1. **Scope creep** — the agent refactors things you didn't ask it to touch
+2. **Context collapse** — after a long session, the agent loses track of your migration constraints
+3. **No rollback** — a wrong change cascades before you can stop it
 
-AGY 的原语直接解决了这三个问题。
+AGY's primitives address all three directly.
 
 ---
 
-## 2.1 — 严格权限：先读后写 <span class="duration-badge">15 min</span>
+## 2.1 — Strict Permissions: Read Before You Write <span class="duration-badge">15 min</span>
 
-AGY 中等同于“计划模式”的功能是**严格权限**——这是一个硬性关卡，在您明确允许之前，它会拒绝所有文件写入和 shell 命令。
+The AGY equivalent of "Plan Mode" is **strict permissions** — a hard gate that denies all file writes and shell commands until you explicitly permit them.
 
-### 在探索之前锁定
+### Lock Down Before You Explore
 
 ```bash
 /permissions
 ```
 
-将级别设置为 `strict`：
+Set the level to `strict`:
 
 ```bash
 # In the permissions dialog, select: strict
@@ -47,13 +47,13 @@ AGY 中等同于“计划模式”的功能是**严格权限**——这是一个
 }
 ```
 
-在 `strict` 模式下，代理可以读取文件、搜索网络和进行推理——但**不能写入、删除或执行任何操作**。这是一堵硬墙，而不是软性的提示词。
+In `strict` mode the agent can read files, search the web, and reason — but **cannot write, delete, or execute anything**. It's a hard wall, not a soft prompt.
 
-> 📖 来源：[严格模式](https://antigravity.google/docs/strict-mode) · [权限](https://antigravity.google/docs/permissions)
+> 📖 Source: [Strict Mode](https://antigravity.google/docs/strict-mode) · [Permissions](https://antigravity.google/docs/permissions)
 
-### 现在自由调查
+### Now Investigate Freely
 
-在写入被锁定的情况下，赋予代理不受限制的读取权限：
+With writes locked, give the agent an unconstrained read mandate:
 
 ```text
 Analyze this entire codebase for a migration. Map:
@@ -65,42 +65,42 @@ Analyze this entire codebase for a migration. Map:
 6. Migration risks ordered by severity
 ```
 
-> **发生了什么：** 代理会读取它所需的所有文件，追踪导入和调用链，并构建一个心智模型——所有这些都具有零修改风险。这是您的侦察阶段。
+> **What's happening:** The agent reads every file it needs, traces imports and call chains, and builds a mental model — all with zero risk of modification. This is your reconnaissance phase.
 
-### 在您的编辑器中审查计划
+### Review the Plan in Your Editor
 
-一旦代理生成了迁移计划，请在您的编辑器中打开它以进行完善：
+Once the agent produces a migration plan, open it in your editor to refine it:
 
 ```text
 ctrl+g
 ```
 
-这将使您进入带有当前代理输出的 `$EDITOR`。编辑约束条件，添加团队特定的要求，划掉您不需要的范围。当您保存并退出时，代理会合并您的编辑。
+This drops you into `$EDITOR` with the current agent output. Edit constraints, add team-specific requirements, strike out scope you don't want. The agent incorporates your edits when you save and exit.
 
-> 📖 来源：[cli-using — 快捷键](https://antigravity.google/docs/cli-using) — uid 3_276–3_280："在默认的 shell 编辑器中编辑提示词"
+> 📖 Source: [cli-using — Keybindings](https://antigravity.google/docs/cli-using) — uid 3_276–3_280: "Edit prompt inside your default shell editor"
 
-### 解锁写入——但仅限于您批准的内容
+### Unlock Writes — But Only for What You Approved
 
-一旦计划获得批准，有选择地恢复写入权限：
+Once the plan is signed off, restore write access selectively:
 
 ```bash
 /permissions
 # Select: request-review
 ```
 
-在 `request-review` 模式下，代理在执行每次写入或 shell 命令之前都会请求批准。在它执行操作之前，您可以确切地看到它想要做什么。
+In `request-review` mode, the agent asks for approval before every write or shell command. You see exactly what it wants to do before it does it.
 
-> **流程：** `strict`（调查）→ 批准计划 → `request-review`（在监督下执行）→ `always-proceed` 仅用于受信任、经过充分测试的最终步骤。
+> **The flow:** `strict` (investigate) → approve plan → `request-review` (execute with oversight) → `always-proceed` only for trusted, well-tested final steps.
 
 ---
 
-## 2.2 — AGENTS.md：编码迁移标准 <span class="duration-badge">10 分钟</span>
+## 2.2 — AGENTS.md: Encoding Migration Standards <span class="duration-badge">10 min</span>
 
-在长时间的会话中，上下文会逐渐丢失。AGENTS.md 就是用来防止这种情况的——无论对话持续多久，它都会自动注入到每个会话中。
+Context collapses over long sessions. AGENTS.md is how you prevent it — it's injected into every session automatically, no matter how long the conversation runs.
 
-### 代理自我引导
+### Agent Self-Onboarding
 
-最强大的模式是让代理根据其在调查过程中发现的内容**编写自己的 AGENTS.md**。它将学到的知识编码为护栏，用于指导其后续的工作。
+The most powerful pattern is having the agent **write its own AGENTS.md** from what it found during investigation. It encodes what it learned as guardrails for its own subsequent work.
 
 ```text
 Based on your codebase analysis, write an AGENTS.md that:
@@ -117,11 +117,11 @@ Based on your codebase analysis, write an AGENTS.md that:
 Write this to AGENTS.md in the project root.
 ```
 
-> **为什么自我引导有效：** 代理正在为自己编写指令。从此时起，它做出的每一个迁移决策都会根据其编写的约束条件进行检查。这是一个自我强化的循环——更好的上下文产生更好的更改，从而浮现出更多模式，进而改善上下文。
+> **Why self-onboarding works:** The agent is writing instructions for itself. Every migration decision it makes from this point forward is checked against constraints it authored. This is a self-reinforcing loop — better context produces better changes, which surface more patterns, which improve context.
 
-### 使用 @file 导入的模块化上下文
+### Modular Context with @file Imports
 
-对于大型项目，请保持 AGENTS.md 精简并导入详细的规范：
+For large projects, keep AGENTS.md lean and import detailed specs:
 
 ```markdown
 # AGENTS.md
@@ -131,11 +131,11 @@ Write this to AGENTS.md in the project root.
 @./docs/migration/phase-1-checklist.md
 ```
 
-> 📖 来源：[cli-using](https://antigravity.google/docs/cli-using) — AGENTS.md 导入语法
+> 📖 Source: [cli-using](https://antigravity.google/docs/cli-using) — AGENTS.md import syntax
 
-### 用于硬约束的规则文件
+### Rules Files for Hard Constraints
 
-对于不可协商的要求，请使用 `.agents/rules.md`——这些将作为系统提示词指令注入，而不仅仅是上下文：
+For non-negotiable requirements, use `.agents/rules.md` — these are injected as system prompt directives, not just context:
 
 ```markdown
 # .agents/rules.md
@@ -146,15 +146,15 @@ Write this to AGENTS.md in the project root.
 - ALWAYS commit with message format: "migrate(phase-N): <description>"
 ```
 
-> 📖 来源：[cli-using](https://antigravity.google/docs/cli-using) — `.agents/rules.md` 系统提示词指令
+> 📖 Source: [cli-using](https://antigravity.google/docs/cli-using) — `.agents/rules.md` system prompt directives
 
 ---
 
-## 2.3 — 子代理：并行分析团队 <span class="duration-badge">15 分钟</span>
+## 2.3 — Subagents: Parallel Analysis Teams <span class="duration-badge">15 min</span>
 
-大型迁移有多个独立的关注点——安全性、性能、API 契约、测试覆盖率。按顺序运行它们速度很慢，并且会浪费代理的上下文窗口。使用子代理进行并行化。
+Large migrations have multiple independent concerns — security, performance, API contracts, test coverage. Running them sequentially is slow and wastes the agent's context window. Use subagents to parallelize.
 
-### 生成并行分析团队
+### Spawn a Parallel Analysis Team
 
 ```text
 I need three parallel analyses before we start migrating. Please spawn:
@@ -172,31 +172,31 @@ I need three parallel analyses before we start migrating. Please spawn:
 Run all three concurrently. I'll review the reports before we start Phase 1.
 ```
 
-### 从子代理面板进行监控
+### Monitor from the Subagents Panel
 
 ```bash
 /agents
 ```
 
-面板显示所有正在运行的子代理及其状态：`running`、`done`、`killed`。观察这三个子代理同时完成。
+The panel shows all running subagents with status: `running`, `done`, `killed`. Watch all three finish simultaneously.
 
 ```text
-ctrl+j
+alt+j
 ```
 
-将您传送到下一个等待您批准的子代理——如果某个子代理触及权限边界并需要放行，这将非常有用。
+Teleports you to the next subagent waiting for your approval — useful if one hits a permission boundary and needs a go-ahead.
 
 ```text
 ctrl+k
 ```
 
-从主对话中快速批准子代理的权限请求，而无需离开您当前的上下文。
+Fast-approve a subagent permission request from the main conversation without leaving your current context.
 
-> 📖 来源：[cli-features — 子代理](https://antigravity.google/docs/cli-features) — uid 5_278–5_316
+> 📖 Source: [cli-features — Subagents](https://antigravity.google/docs/cli-features) — uid 5_278–5_316
 
-### 自定义子代理定义
+### Custom Subagent Definition
 
-在 `.agents/agents/security-scanner.md` 中创建一个只读的安全扫描器：
+Create a read-only security scanner in `.agents/agents/security-scanner.md`:
 
 ```markdown
 ---
@@ -224,27 +224,27 @@ Always report: file path, line number, severity (HIGH/MEDIUM/LOW), and remediati
 Never modify any file. Never execute any command.
 ```
 
-> 📖 来源：[子代理](https://antigravity.google/docs/subagents) · [cli-features](https://antigravity.google/docs/cli-features) — uid 5_274: 细粒度权限 JSON 格式
+> 📖 Source: [Subagents](https://antigravity.google/docs/subagents) · [cli-features](https://antigravity.google/docs/cli-features) — uid 5_274: fine-grained permissions JSON format
 
 ---
 
-## 2.4 — 技能：可重用的迁移专业知识 <span class="duration-badge">10 min</span>
+## 2.4 — Skills: Reusable Migration Expertise <span class="duration-badge">10 min</span>
 
-技能是代理在适用时读取并激活的指令集。对于可重复的迁移（Java 8→21、.NET Framework→.NET 8、Express→Fastify），只需将该模式一次性编码为一项技能即可。
+Skills are instruction sets the agent reads and activates when relevant. For repeatable migrations (Java 8→21, .NET Framework→.NET 8, Express→Fastify), encode the pattern once as a skill.
 
-### 浏览可用技能
+### Browse Available Skills
 
 ```bash
 /skills
 ```
 
-### 创建迁移技能
+### Create a Migration Skill
 
 ```bash
 mkdir -p ~/.gemini/antigravity-cli/skills/java-migration
 ```
 
-创建 `~/.gemini/antigravity-cli/skills/java-migration/SKILL.md`：
+Create `~/.gemini/antigravity-cli/skills/java-migration/SKILL.md`:
 
 ```markdown
 ---
@@ -283,112 +283,126 @@ description: >
 **Validation:** All tests pass with new config loading path.
 ```
 
-> 📖 来源：[技能](https://antigravity.google/docs/skills) · [CLI 功能 — /skills](https://antigravity.google/docs/cli-features) — uid 5_251–5_253
+> 📖 Source: [Skills](https://antigravity.google/docs/skills) · [cli-features — /skills](https://antigravity.google/docs/cli-features) — uid 5_251–5_253
 
 ---
 
-## 2.5 — 钩子：自动化护栏 <span class="duration-badge">10 min</span>
+## 2.5 — Hooks: Automated Guardrails <span class="duration-badge">10 min</span>
 
-对于企业级迁移，您需要自动化的关卡——而不仅仅是手动审查。钩子在 CLI 事件触发时执行，并可以在工具使用发生之前进行拦截、警告或记录。
+For enterprise migrations, you want automated gates — not just manual review. Hooks fire on CLI lifecycle events and can block, warn, or log tool calls before and after execution.
 
-### 工具前置钩子：拦截迁移范围外的写入操作
+### Pre-Tool Hook: Block Writes Outside Migration Scope
 
-创建 `.agents/hooks/scope-guard.sh`：
+Create `.agents/hooks/scope-guard.sh`:
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 # AGY CLI hook event: PreToolUse
-# Blocks writes to files outside the current migration module
+# Blocks file modifications outside migration module
 
-TOOL_NAME="$1"
-FILE_PATH="$2"
-MIGRATION_MODULE="${MIGRATION_MODULE:-src/auth}"  # Set before starting each phase
+input=$(cat)
+filepath=$(echo "$input" | jq -r '.toolCall.args.TargetFile // ""')
+migration_module="${MIGRATION_MODULE:-src/auth}"
 
-if [[ "$TOOL_NAME" == "write_file" || "$TOOL_NAME" == "edit" ]]; then
-  if [[ "$FILE_PATH" != *"$MIGRATION_MODULE"* ]]; then
-    echo "BLOCK: Write to $FILE_PATH is outside migration scope ($MIGRATION_MODULE)" >&2
-    exit 1  # Non-zero exit blocks the tool call
-  fi
+if [ -n "$filepath" ] && [[ "$filepath" != *"$migration_module"* ]]; then
+  echo "{\"decision\":\"deny\",\"reason\":\"File write to $filepath is outside active migration module ($migration_module)\"}"
+else
+  echo '{"decision":"allow"}'
 fi
 ```
 
-在 `settings.json` 中注册：
+Make it executable:
+
+```bash
+chmod +x .agents/hooks/scope-guard.sh
+```
+
+Register in `.agents/hooks.json`:
 
 ```json
 {
-  "hooks": {
+  "scope-guard": {
     "PreToolUse": [
       {
-        "matcher": "write_file|edit",
-        "command": ".agents/hooks/scope-guard.sh"
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.agents/hooks/scope-guard.sh",
+            "timeout": 5
+          }
+        ]
       }
     ]
   }
 }
 ```
 
-### 工具后置钩子：在每次文件写入后自动运行测试
+### Post-Tool Hook: Diagnostic Telemetry After File Writes
+
+Create `.agents/hooks/test-logger.sh`:
 
 ```bash
-#!/bin/bash
+#!/usr/bin/env bash
 # AGY CLI hook event: PostToolUse
-# Runs tests automatically after every source file write
+# Logs diagnostic telemetry if a tool execution encounters an error
 
-TOOL_NAME="$1"
-FILE_PATH="$2"
+input=$(cat)
+tool_name=$(echo "$input" | jq -r '.toolCall.name // ""')
+tool_error=$(echo "$input" | jq -r '.error // ""')
 
-if [[ "$TOOL_NAME" == "write_file" && "$FILE_PATH" == *".java" ]]; then
-  echo "Running test gate after $FILE_PATH was modified..."
-  mvn test -pl "$(dirname $FILE_PATH | sed 's|src/main/java||')" -q 2>&1
-  if [[ $? -ne 0 ]]; then
-    echo "⚠️  Tests failed after writing $FILE_PATH — consider /rewind"
-  fi
+if [ -n "$tool_error" ]; then
+  mkdir -p .agents/logs
+  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Error in $tool_name: $tool_error" >> .agents/logs/migration_errors.log
 fi
+
+# PostToolUse output contract is strictly an empty JSON object
+echo '{}'
 ```
 
-> 📖 来源：[钩子](https://antigravity.google/docs/hooks)
+> 📖 Source: [Hooks docs](https://antigravity.google/docs/hooks)
 
 ---
 
-## 2.6 — /rewind 和 /fork：你的安全网 <span class="duration-badge">5 分钟</span>
+## 2.6 — /rewind and /fork: Your Safety Net <span class="duration-badge">5 min</span>
 
-### /rewind — 回滚对话
+### /rewind — Roll Back the Conversation
 
-如果代理偏离了轨道，你不需要重新开始。`/rewind` 可以回滚对话历史记录：
+If the agent goes off-track, you don't need to start over. `/rewind` rolls back conversation history:
 
 ```bash
 /rewind
 ```
 
-这将打开一个历史记录选择器。选择要还原到的对话轮次。代理对代码库的理解将重置到该点 —— 如果它在长时间的会话中积累了错误的假设，这将非常有用。
+This opens a history picker. Select the turn to revert to. The agent's understanding of the codebase resets to that point — useful if it's accumulated incorrect assumptions during a long session.
 
-> 📖 来源：[cli-features](https://antigravity.google/docs/cli-features) — uid 5_220–5_226："`/rewind`（别名 `/undo`）—— 回滚对话历史记录"
+> 📖 Source: [cli-features](https://antigravity.google/docs/cli-features) — uid 5_220–5_226: "`/rewind` (alias `/undo`) — roll back conversation history"
 
-### /fork — 无风险探索
+### /fork — Explore Without Risk
 
-在尝试有风险的迁移步骤之前，请 fork 对话：
+Before attempting a risky migration step, fork the conversation:
 
 ```bash
 /fork
 ```
 
-这将创建一个平行的工作区。你可以在 fork 出的分支中尝试有风险的方法。如果成功了，那很好。如果失败了，关闭该分支并从主对话继续 —— 主对话从未改变过。
+This creates a parallel workspace. You can try the risky approach in the fork. If it works, great. If it doesn't, close the fork and continue from the main conversation — which never changed.
 
-> 📖 来源：[cli-using](https://antigravity.google/docs/cli-using) — uid 3_219–3_224："`/fork` 启动一个独立的工作区"
+> 📖 Source: [cli-using](https://antigravity.google/docs/cli-using) — uid 3_219–3_224: "`/fork` to spin up a separate workspace"
 
-### /resume — 继续漫长的迁移
+### /resume — Pick Up Long Migrations
 
-大型迁移会跨越好几天。当你返回时：
+Large migrations span multiple days. When you return:
 
 ```bash
 /resume
 ```
 
-这将打开一个会话选择器，显示你之前的迁移会话及其时间戳和对话名称。选择正确的会话，即可准确地从你离开的地方继续。
+This opens a session picker showing your previous migration sessions with timestamps and conversation names. Select the right one to continue exactly where you left off.
 
-> 📖 来源：[cli-features](https://antigravity.google/docs/cli-features) — uid 5_213–5_219
+> 📖 Source: [cli-features](https://antigravity.google/docs/cli-features) — uid 5_213–5_219
 
-重命名会话以保持迁移井然有序：
+Rename sessions to keep migrations organized:
 
 ```bash
 /rename "Java 21 Migration — Phase 2: Jakarta namespace"
@@ -396,9 +410,9 @@ fi
 
 ---
 
-## 2.7 — 打印模式：非交互式迁移流水线 <span class="duration-badge">5 min</span>
+## 2.7 — Print Mode: Non-Interactive Migration Pipeline <span class="duration-badge">5 min</span>
 
-对于 CI/CD 门禁或夜间迁移运行，请使用打印模式以管道方式处理迁移任务，而无需交互：
+For CI/CD gates or overnight migration runs, use print mode to pipe migration tasks without interaction:
 
 ```bash
 # Dry-run: analyze and report issues — no writes
@@ -416,70 +430,70 @@ agy -p "Scan src/auth/ for javax.persistence.* usage" | \
   a step-by-step migration plan with exact sed commands" > migration-plan.md
 ```
 
-> 📖 来源：[cli-getting-started](https://antigravity.google/docs/cli-getting-started) — `agy --help`："-p: --print 的简写别名"
+> 📖 Source: [cli-getting-started](https://antigravity.google/docs/cli-getting-started) — `agy --help`: "-p: Short alias for --print"
 
 ---
 
-## 动手练习
+## Hands-On Exercise
 
 <div class="exercise-card" markdown>
 
-### :material-file-document: 练习 8：遗留系统现代化
+### :material-file-document: Exercise 8: Legacy Modernization
 
-**文件：** [`ex08_dotnet_modernization.md`](exercises/ex08_dotnet_modernization.md) · [`ex09_java_upgrade.md`](exercises/ex09_java_upgrade.md)  
-**时长：** 45 分钟  
-**目标：** 使用本模块中的 AGY 原语完成一次完整的迁移。
+**Files:** [`ex08_dotnet_modernization.md`](exercises/ex08_dotnet_modernization.md) · [`ex09_java_upgrade.md`](exercises/ex09_java_upgrade.md)  
+**Duration:** 45 min  
+**Objective:** Walk through a full migration using the AGY primitives from this module.
 
-**选择你的路线：**
+**Choose your track:**
 
-#### 路线 A：计划优先（严格 → 调查 → 执行）
+#### Track A: Plan-First (Strict → Investigate → Execute)
 
-1. 将 `/permissions` 设置为 `strict` — 锁定所有写入操作
-2. 赋予代理全面的调查权限（第 2.1 节）
-3. 使用 `ctrl+g` 在编辑器中打开计划并添加团队约束
-4. 编写一个包含迁移规则的 AGENTS.md（或让代理编写）
-5. 添加一个包含不可协商的硬性规定的 `.agents/rules.md`
-6. 切换到 `request-review` — 在监督下开始第一阶段
-7. 如果代理偏离范围，请使用 `/rewind`
-8. 重命名会话：`/rename "迁移 — 第一阶段完成"`
+1. Set `/permissions` to `strict` — lock all writes
+2. Give the agent a full investigation mandate (Section 2.1)
+3. Use `ctrl+g` to open the plan in your editor and add team constraints
+4. Write an AGENTS.md encoding the migration rules (or have the agent write it)
+5. Add a `.agents/rules.md` with hard non-negotiables
+6. Switch to `request-review` — begin Phase 1 with oversight
+7. Use `/rewind` if the agent drifts outside scope
+8. Rename the session: `/rename "Migration — Phase 1 complete"`
 
-#### 路线 B：子代理优先（并行分析 → 上下文 → 执行）
+#### Track B: Subagent-First (Parallel Analysis → Context → Execute)
 
-1. 生成三个并行的子代理：安全扫描、依赖项映射、测试覆盖率
-2. 通过 `/agents` 进行监控 — 使用 `ctrl+j` 和 `ctrl+k` 进行审批
-3. 将它们的报告汇总到一个 AGENTS.md 中（让代理进行综合）
-4. 安装 `java-migration` 技能（第 2.4 节）
-5. 在最危险的步骤之前使用 `/fork` — 先在那里进行尝试
-6. 使用打印模式生成阶段后报告
+1. Spawn three parallel subagents: security scan, dependency map, test coverage
+2. Monitor via `/agents` — use `alt+j` and `ctrl+k` for approvals
+3. Aggregate their reports into an AGENTS.md (have the agent synthesize)
+4. Install the `java-migration` skill (Section 2.4)
+5. Use `/fork` before the riskiest step — try it there first
+6. Use print mode to generate a post-phase report
 
 </div>
 
 ---
 
-## 总结：用于遗留系统现代化的 AGY 原语
+## Summary: AGY Primitives for Legacy Modernization
 
-| 原语 | 功能说明 | 适用场景 |
+| Primitive | What It Does | When to Use |
 | :-- | :-- | :-- |
-| `/permissions strict` | 严格的只读限制 — 禁止写入或执行命令 | 调查阶段 |
-| `/permissions request-review` | 代理在每次写入前请求批准 | 受控执行 |
-| `ctrl+g` | 在 `$EDITOR` 中打开计划以进行协作编辑 | 计划完善 |
-| **AGENTS.md** | 跨会话的持久化迁移标准 | 始终适用 — 编码约束条件 |
-| `.agents/rules.md` | 严格的系统提示词指令 | 不可协商的护栏 |
-| **子代理** | 并行分析团队 | 多关注点调查 |
-| `/agents` + `ctrl+j` + `ctrl+k` | 监控并批准子代理的工作 | 并行运行期间 |
-| **钩子** (PreToolUse) | 阻止迁移范围之外的写入 | 自动化护栏 |
-| **钩子** (PostToolUse) | 每次更改后自动运行测试 | 测试关卡自动化 |
-| `/rewind` | 如果代理偏离方向则回滚对话 | 会话中途纠正方向 |
-| `/fork` | 在隔离的分支中尝试有风险的步骤 | 高风险更改之前 |
-| `/resume` | 恢复跨越多天的迁移 | 返回会话时 |
-| `/rename` | 按阶段标记会话 | 会话管理 |
-| `agy -p` | 非交互式迁移流水线 | CI 关卡、夜间运行 |
-| **技能** | 可重用的迁移剧本 | 可重复的迁移模式 |
+| `/permissions strict` | Hard read-only gate — no writes or commands | Investigation phase |
+| `/permissions request-review` | Agent asks before every write | Controlled execution |
+| `ctrl+g` | Open plan in `$EDITOR` for collaborative editing | Plan refinement |
+| **AGENTS.md** | Persistent migration standards across sessions | Always — encode constraints |
+| `.agents/rules.md` | Hard system-prompt directives | Non-negotiable guardrails |
+| **Subagents** | Parallel analysis teams | Multi-concern investigations |
+| `/agents` + `alt+j` + `ctrl+k` | Monitor and approve subagent work | During parallel runs |
+| **Hooks** (PreToolUse) | Block writes outside migration scope | Automated guardrails |
+| **Hooks** (PostToolUse) | Auto-run tests after every change | Test gate automation |
+| `/rewind` | Roll back conversation if agent drifts | Mid-session course correction |
+| `/fork` | Try risky steps in an isolated branch | Before high-risk changes |
+| `/resume` | Pick up multi-day migrations | Returning to a session |
+| `/rename` | Label sessions by phase | Session management |
+| `agy -p` | Non-interactive migration pipeline | CI gates, overnight runs |
+| **Skills** | Reusable migration playbooks | Repeatable migration patterns |
 
 ---
 
-## 下一步
+## Next Step
 
-→ 继续前往 **[模块 3：使用 SDK 构建 AGY 代理](agy-sdk.md)**
+→ Continue to **[Module 3: Building AGY Agents with the SDK](agy-sdk.md)**
 
-→ **[速查表](cheatsheet.md)** — 所有命令汇集于此
+→ **[Cheatsheet](cheatsheet.md)** — all commands in one place

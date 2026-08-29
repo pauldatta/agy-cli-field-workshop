@@ -217,35 +217,81 @@ For maximum control, pair sandbox mode with the permissions model:
 
 ---
 
-## DevOps 6 — Hooks & Rules <span class="duration-badge">5 min</span>
+## DevOps 6 — Hooks & Rules <span class="duration-badge">10 min</span>
 
 > **Pattern: Guardrails & Automation** — enforce standards and trigger actions at key lifecycle points.
 
-### Hooks
+### Antigravity Lifecycle Hooks
 
-Hooks let you run custom logic at 5 lifecycle events:
+Hooks execute custom scripts or binaries at 5 lifecycle stages in Antigravity's execution loop. Configured in `.agents/hooks.json` (workspace) or `~/.gemini/config/hooks.json` (global).
 
-| Event | When it fires |
-| :-- | :-- |
-| `PreToolUse` | Before agy calls any tool (read file, run command, etc.) |
-| `PostToolUse` | After a tool call completes |
-| `PreInvocation` | Before agy starts processing a prompt |
-| `PostInvocation` | After agy finishes a response |
-| `Stop` | When the session ends |
+#### Lifecycle Events & Contracts
 
-Configure hooks in `hooks.json` (in `.agents/` for project or `~/.gemini/config/` for global). Hook scripts receive JSON on stdin and return JSON on stdout.
+| Event | Matcher Target | stdin Input Summary | stdout Response Contract |
+| :-- | :-- | :-- | :-- |
+| **`PreToolUse`** | Tool name regex (e.g. `run_command`, `write_to_file` or `replace_file_content`) | `.toolCall.name`, `.toolCall.args`, `.stepIdx`, `.workspacePaths` | `{"decision": "allow"}` or `{"decision": "deny", "reason": "..."}` |
+| **`PostToolUse`** | Tool name regex | `.toolCall.name`, `.toolCall.args`, `.stepIdx`, `.error` | `{}` (Telemetry and observer contract) |
+| **`PreInvocation`** | N/A (fires before model turn) | `.invocationNum`, `.initialNumSteps`, `.workspacePaths`, `.modelName` | `{"injectSteps": [{"ephemeralMessage": "..."}]}` |
+| **`PostInvocation`** | N/A (fires after model turn) | `.invocationNum`, `.initialNumSteps`, `.workspacePaths` | `{"injectSteps": [...], "terminationBehavior": "force_continue"}` |
+| **`Stop`** | N/A (fires upon completion) | `.executionNum`, `.terminationReason`, `.error`, `.fullyIdle` | `{"decision": "continue", "reason": "..."}` or `{"decision": "allow"}` |
 
-#### Sample Hooks (in `samples/hooks/`)
+#### Configuration File Format (`.agents/hooks.json`)
 
-| Script | Event | Purpose |
-| :-- | :-- | :-- |
-| `secret-scanner.sh` | `PreToolUse` | Blocks writes that contain hardcoded credentials |
-| `git-context-injector.sh` | `PreToolUse` | Injects recent git history for the target file before writes |
-| `test-nudge.sh` | `PostToolUse` | Nudges the agent to run tests after file writes |
-| `session-context.sh` | `PreInvocation` | Injects branch, pending changes, and dependencies at session start |
+```json
+{
+  "security-gate": {
+    "enabled": true,
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.agents/hooks/secret-scanner.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "session-context-injector": {
+    "enabled": true,
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "./.agents/hooks/session-context.sh",
+        "timeout": 5
+      }
+    ]
+  },
+  "tool-telemetry": {
+    "enabled": true,
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.agents/hooks/test-nudge.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
-> 📖 Full details: [Hooks docs](https://www.antigravity.google/docs/hooks)
+#### Sample Scripts (in `samples/hooks/`)
 
+| Script | Event | Contract Output | Purpose |
+| :-- | :-- | :-- | :-- |
+| **`secret-scanner.sh`** | `PreToolUse` | `{"decision": "deny"}` or `{"decision": "allow"}` | Hard blocks credential leaks in file writes and shell commands |
+| **`git-context-injector.sh`** | `PreToolUse` | `{"decision": "allow", "reason": "..."}` | Verifies recent git history before file modifications |
+| **`session-context.sh`** | `PreInvocation` | `{"injectSteps": [{"ephemeralMessage": "..."}]}` | Injects branch, dirty files, and toolchain version as ephemeral context |
+| **`test-nudge.sh`** | `PostToolUse` | `{}` | Logs failed tool executions to `.agents/logs/tool_audit.log` |
+
+> 📖 Full reference: [Hooks docs](https://antigravity.google/docs/hooks)
 ### Rules
 
 Rules are markdown files injected into agy's system prompt as `RULE` blocks — hard constraints that agy must follow.
