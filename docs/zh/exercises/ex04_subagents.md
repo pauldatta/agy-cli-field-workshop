@@ -1,24 +1,28 @@
-# 练习 4：子代理
+# Exercise 4: Built-In & Custom Subagents
 
-> **时长：** 20 分钟 | **模块：** 4 — 多代理与高级
-
----
-
-## 目标
-
-在您的代码库上生成并行的子代理，练习对抗性审查者模式，并观察隔离执行。
+> **Duration:** 25 min (Fast: 15 min · Average: 25 min · Thorough: 35 min) | **Module:** 4 — Multi-Agent & Advanced
 
 ---
 
-## 第 1 部分：并行审计（10 分钟）
+## Objective
 
-以交互方式启动 agy：
+Master parallel subagent execution in Antigravity CLI:
+1. Dispatch parallel built-in subagents using `branch` and `inherit` workspace modes.
+2. Define a **Custom Subagent** in `.agents/agents/` using the YAML frontmatter schema.
+3. Manage and inspect active subagents using the interactive **`/agents`** panel and keyboard shortcuts (**`Alt+J`** / **`Ctrl+K`**).
+4. Coordinate collaborative multi-agent workflows with **`/teamwork-preview`**.
+
+---
+
+## Part 1: Dispatch Parallel Built-In Subagents (8 min)
+
+Launch agy interactively:
 
 ```bash
 agy
 ```
 
-派遣一个并行审计团队：
+Dispatch a parallel audit team on your codebase:
 
 ```text
 > Spawn two subagents in parallel using branch workspace mode:
@@ -28,56 +32,108 @@ agy
 > Report back when both complete with a combined findings summary.
 ```
 
-在它们运行期间，询问：
+While they execute in the background:
 
-```text
-> What's the status of the subagents?
-```
-
-当它们完成时：
-
-```text
-> Show me the combined findings from both audits. What are the top 3 things to fix?
-```
+* Type **`/agents`** to open the Agent Manager Panel. Observe the live checklist showing subagent IDs, roles, lifecycle states (`running` / `done`), and active tool steps.
+* Highlight an active subagent with `↑/↓` and press **`Enter`** to inspect its private reasoning trajectory and tool outputs. Press **`Esc`** to return.
+* When subagents request tool approvals, press **`Alt+J`** to teleport focus directly to the pending approval, or press **`Ctrl+K`** to fast-path approve from the main conversation.
 
 ---
 
-## 第 2 部分：对抗性审查员 (7 分钟)
+## Part 2: Define a Custom Subagent (`.agents/agents/`) (7 min)
 
-选择一个最近的 PR、分支或任何一组更改：
+Create the project workspace agents directory:
 
 ```bash
-git checkout -b feature/my-test-branch
-# (make a few changes)
-git add -A
+mkdir -p .agents/agents
 ```
 
-回到 agy 中：
+Create a custom security auditor definition in `.agents/agents/security-auditor.md`:
 
-```text
-> I have changes on the current branch. Spawn an adversarial reviewer subagent.
-> Its only job: find reasons why these changes should NOT be merged.
-> It should challenge assumptions, look for edge cases, and be skeptical of everything.
-> Be harsh — this is an adversarial review, not a supportive one.
+```markdown
+---
+name: security-auditor
+description: Specialized subagent for security audits, OWASP Top 10 scanning, and vulnerability reviews.
+tools:
+  - view_file
+  - grep_search
+  - find_by_name
+  - run_command
+mainAgent: false
+subagent: true
+model: pro
+commandExecutionPolicy: sandbox
+---
+
+# System Prompt
+You are a principal security engineer conducting a deep source code audit.
+
+# Review Guidelines
+1. Systematically check for SQL injection, unescaped user input (XSS), missing authorization middleware, hardcoded secrets, and path traversal flaws.
+2. For every finding, provide: Severity, File path, Line number, Problem explanation, and concrete remediation code.
+3. Perform read-only static analysis unless explicitly instructed to apply fixes.
 ```
-
-阅读对抗性审查的发现。目标是找出彻底的代码审查会发现的问题。
 
 ---
 
-## 第 3 部分：恢复子代理的工作 (3 分钟)
+## Part 3: Delegate to Your Custom Subagent (5 min)
 
-```text
-> One of the subagent findings mentioned [specific issue]. Let's fix it. Create a subagent in inherit mode to implement the fix.
+Start a new agy session:
+
+```bash
+agy
 ```
 
-请注意与分支模式的区别：`inherit` 意味着子代理与您的主会话在同一个目录中工作——适用于有针对性的、无冲突的修复。
+Verify that your custom agent is discovered:
+
+```text
+> /agents
+```
+
+Notice that `security-auditor` is listed in the custom subagents registry.
+
+Now trigger delegation naturally in chat:
+
+```text
+> Delegate a security review of our source code to the security-auditor subagent.
+```
+
+Observe how `agy`:
+1. Identifies the `security-auditor` specialist from its YAML description.
+2. Invokes it via `invoke_subagent` with the `pro` reasoning tier.
+3. Constrains its toolset strictly to `[view_file, grep_search, find_by_name, run_command]` in sandbox mode.
+4. Synthesizes the subagent's structured report back into your primary thread upon completion.
 
 ---
 
-## 完成标准
+## Part 4: Multi-Agent Teamwork Preview (5 min)
 
-- [ ] 成功生成了至少 2 个并行的子代理
-- [ ] 两个子代理均已运行并返回了发现结果
-- [ ] 对抗性审查者返回了关键发现结果
-- [ ] 使用了至少两种不同的工作区模式（分支与继承）
+For complex multi-file refactoring or large milestone decomposition, preview Antigravity's collaborative agent teams:
+
+```text
+> /teamwork-preview Refactor our database query layer to use prepared statements across all controllers. Coordinate a team to implement changes and verify with unit tests.
+```
+
+Observe how teamwork orchestrates multiple coordinated roles (planner, implementer, verifier) working in parallel git worktrees.
+
+---
+
+## Pro Tips & Key Watchouts
+
+!!! tip "Key Things to Watch For"
+    1. **Tool Name Validation:** When configuring `tools` in YAML frontmatter, ensure exact tool names are used (`view_file`, `grep_search`, `find_by_name`, `replace_file_content`, `run_command`). Misspelled or unmapped tool names may cause subagent processes to hang.
+    2. **Nesting Depth Limits:** Subagents can spawn their own subagents up to a hard ceiling of **10 nesting levels** to prevent infinite recursion.
+    3. **Idle State & Auto-Wake:** Subagents transition from `Running` to `Idle` upon completing a task. If you send a follow-up message to a subagent ID, it automatically re-awakens with full context retention.
+    4. **Automatic Worktree Cleanup:** Subagents spawned in `branch` workspace mode create temporary git worktrees that are automatically cleaned up when the subagent finishes or is killed.
+
+---
+
+## Completion Criteria
+
+- [ ] Spawned parallel built-in subagents and inspected active states via `/agents`
+- [ ] Navigated approvals using `Alt+J` (teleport) and `Ctrl+K` (fast-path approve)
+- [ ] Created a Custom Subagent `.md` file with valid YAML frontmatter in `.agents/agents/`
+- [ ] Successfully delegated a task to the custom subagent via natural language
+- [ ] Tested `/teamwork-preview` collaborative agent team orchestration
+
+

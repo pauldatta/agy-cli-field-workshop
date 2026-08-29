@@ -6,98 +6,192 @@
 
 ## 4.0 — The agy Agent Model <span class="duration-badge">5 min</span>
 
-agy-cli can spawn **subagents** — isolated task runners that operate in parallel, each with their own workspace context. Unlike running multiple terminal tabs with separate agy sessions, subagents are coordinated: they can share a workspace, work on isolated branches, or operate on a cloned copy.
+agy-cli can spawn **subagents** — isolated task runners that operate in parallel, each with their own workspace context. Instead of executing every step serially, the primary agent delegates tasks (running tests, performing deep codebase searches, or refactoring modules) to dedicated subagents. This preserves the parent agent's context window while parallelizing execution.
 
-Three workspace modes:
+### Workspace Modes
 
 | Mode | What it means | Use when |
 | :-- | :-- | :-- |
-| `inherit` | Subagent shares the same workspace | Additive tasks — no conflicts expected |
-| `branch` | Subagent gets an isolated clone | Parallel changes to the same files |
-| `share` | Git worktree — isolated branch, shared repo | True parallel development |
+| `inherit` | Subagent shares the parent's working directory | Additive tasks where no concurrent file conflicts are expected |
+| `branch` | Subagent gets an isolated Git clone / branch | Parallel changes to the same files or destructive refactoring |
+| `share` | Git worktree — isolated branch sharing directory storage | True parallel development with minimal disk overhead |
 
-### Switching Models
+### Model Selection (`/model`)
 
-Use `/model` to switch the active model mid-session — useful when you want heavier reasoning for a specific task:
+Use `/model` to inspect and switch the active model tier:
 
 ```bash
 /model
 ```
 
-This opens a model picker showing available options (Gemini 3.7 Flash, Gemini 3.6 Flash, Gemini 3.5 Flash, Gemini 3.1 Pro, Claude Sonnet 4.6, GPT-OSS-120b, etc.).
+Available model options include **Gemini 3.7 Flash** (default speed & reasoning), **Gemini 3.6 Flash**, **Gemini 3.5 Flash**, **Gemini 3.1 Pro** (complex orchestration), **Claude Sonnet / Opus 4.6**, and **GPT-OSS-120b**.
 
 > 📖 Full model list: [Models docs](https://www.antigravity.google/docs/models)
 
 ---
 
-## 4.1 — Spawning Subagents <span class="duration-badge">15 min</span>
+## 4.1 — Built-In & Custom Subagents <span class="duration-badge">20 min</span>
 
-> **Pattern: Parallel Execution** — dispatch multiple agents to work simultaneously.
-> 📖 Full reference: [Subagents docs](https://www.antigravity.google/docs/subagents)
+> **Pattern: Parallel Specialization** — dispatch specialized agents configured for specific roles and toolsets.
+> 📖 Full reference: [Subagents docs](https://antigravity.google/docs/subagents) · [CLI Subagents](https://antigravity.google/docs/cli/subagents)
 
-### From an Interactive Session
+### Built-In Subagents
 
-```text
-> Spawn a subagent to write unit tests for the auth module while I work on the API refactor.
+Antigravity comes pre-packaged with several specialized subagents:
+
+* **`research`**: Optimized for codebase exploration, symbol lookups, and structural navigation.
+* **`browser`**: Operates sandboxed web browsers to perform UI testing and DOM analysis (invoked via `/browser`).
+* **`self`**: A direct clone of the parent agent, inheriting identical system prompts and toolsets.
+
+### Defining Custom Subagents (`.md`)
+
+You can define reusable custom subagents in Markdown format (`.md`) with YAML frontmatter.
+
+#### Agent Location and Discovery
+
+Antigravity automatically discovers custom agent definitions across three hierarchical scopes:
+
+| Scope | Discovery Path | Use Case |
+| :-- | :-- | :-- |
+| **Workspace** | `.agents/agents/<name>.md` or `.agents/agents/<name>/agent.md` | Team/project-specific specialists committed to git |
+| **Global** | `~/.gemini/config/agents/<name>.md` or `.../agents/<name>/agent.md` | Personal agents available across all projects on your machine |
+| **Plugins** | `plugins/<plugin_name>/agents/` | Bundled agents distributed with CLI plugins |
+
+#### YAML Frontmatter Specification
+
+```markdown
+---
+name: security-auditor
+description: Specialized subagent for security audits, static analysis, and vulnerability reviews.
+tools:
+  - view_file
+  - grep_search
+  - find_by_name
+  - run_command
+mainAgent: false
+subagent: true
+model: pro
+commandExecutionPolicy: sandbox
+skills:
+  - skills/security-checklist
+---
+
+# System Prompt
+You are an expert security auditor and code reviewer. Inspect source code for vulnerabilities, injection flaws, and exposed credentials.
+
+# Review Guidelines
+1. Perform thorough static analysis without altering files unless explicitly instructed.
+2. Provide concrete remediation snippets for each finding.
 ```
 
-agy will spawn a subagent, report its ID, and continue your main session. The subagent works independently.
+#### Frontmatter Configuration Parameters
 
-```text
-> What's the status of the test-writing subagent?
+| Property | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| `name` | `string` | *(Required)* | Unique identifier for the custom agent. |
+| `description` | `string` | *(Required)* | Purpose description used by the planner to determine when to delegate tasks. |
+| `tools` | `string[]` | `[]` | Explicit list of permitted tools (`view_file`, `replace_file_content`, `grep_search`, `run_command`, etc.). |
+| `mainAgent` | `boolean` | `true` | If `true`, allows selection as the primary session agent in `/agents`. |
+| `subagent` | `boolean` | `true` | If `true`, allows invocation via the `invoke_subagent` tool. |
+| `model` | `string` | `inherit` | Model tier used when invoked (`inherit`, `flash`, or `pro`). |
+| `commandExecutionPolicy` | `string` | `sandbox` | Auto-execution policy for shell commands (`off`, `auto`, `eager`, `sandbox`). |
+| `mcpServers` | `object[]` | `[]` | Custom MCP servers configured for this subagent. |
+| `skills` / `plugins` | `string[]` | `[]` | List of skill paths or plugin dependencies. |
+
+---
+
+## 4.2 — Subagent Lifecycle & Inter-Agent Communication <span class="duration-badge">10 min</span>
+
+### Subagent State Machine
+
+Subagents execute asynchronously in the background across three lifecycle states:
+
+```
+┌─────────┐      task complete       ┌──────┐      kill / finish      ┌────────┐
+│ Running │ ───────────────────────> │ Idle │ ──────────────────────> │ Killed │
+└─────────┘                          └──────┘                         └────────┘
+     ▲                                  │
+     │        incoming message          │
+     └──────────────────────────────────┘
 ```
 
-```text
-> Show me what the test subagent produced.
-```
+1. **Running:** Actively calling tools, generating responses, and executing tasks. (Cancel at any time with `k` in the CLI).
+2. **Idle:** Completed its current task, sent a result message to the parent agent, and paused. **Auto-reawakens to Running** upon receiving a message, retaining full context from prior turns.
+3. **Killed:** Permanently terminated. Temporary Git worktrees are automatically cleaned up, while JSONL execution transcripts remain recorded in `~/.gemini/antigravity-cli/brain/<session-id>/`.
 
-### Managing Subagents with /agents
+### Inter-Agent Messaging & Nesting Limits
 
-Use the `/agents` panel to see all active subagents, their status, and output:
+* **Direct Routing:** Agents communicate by passing messages to unique conversation IDs (`send_message`).
+* **Auto-Wake:** Sending a message to an idle subagent immediately wakes it up to process new instructions.
+* **Nesting Depth Limit:** A maximum nesting depth of **10 levels** is enforced to prevent runaway recursive delegation.
+* **Permission Bubbling:** If a subagent encounters an action requiring user authorization, the request bubbles up directly to your active CLI prompt.
+
+---
+
+## 4.3 — CLI Ergonomics & Agent Management <span class="duration-badge">10 min</span>
+
+### Managing Agents with `/agents`
+
+Open the interactive Agent Manager Panel:
 
 ```bash
 /agents
 ```
 
-Key shortcuts from the main conversation:
+The `/agents` panel displays:
+* **Identifier & Role:** Unique subagent ID and specialized role.
+* **State:** Live status indicators (`running`, `done`, `killed`, `error`).
+* **Step Summary:** Real-time summary of the tool or reasoning step currently being executed.
+* **Deep-Dive:** Highlight an agent with `↑/↓` and press `Enter` to inspect its private thoughts, reasoning logs, and tool outputs. Press `Esc` to return.
 
-| Shortcut | Action |
-| :-- | :-- |
-| `Alt+J` | Teleport to a subagent pending approval — jump directly to review its request |
-| `Ctrl+K` | Fast-approve from the main conversation — approve a subagent's pending action without switching |
+### Background Task Monitor (`/tasks`)
 
-Subagent lifecycle: **Running → Idle → Killed**
+For non-agentic background shell operations (e.g. build jobs, background test suites):
 
-### Limits and Built-in Types
+```bash
+/tasks
+```
 
-- **Max depth:** 10 (subagents can spawn their own subagents, up to 10 levels)
-- **Built-in types:** `research` (web research), `browser` (browser automation), `self` (general purpose)
+### High-Efficiency Keyboard Shortcuts
+
+| Shortcut | Action | Description |
+| :-- | :-- | :-- |
+| **`Alt+J`** | Teleport to Subagent | Instantly jumps from your main conversation into the Detail View of the next subagent awaiting approval. |
+| **`Ctrl+K`** | Fast-Approve Action | Instantly approves a pending subagent tool request from the main prompt bar without switching panels. |
+| **`Ctrl+O`** | Toggle Trajectory | Expands/collapses the full reasoning trajectory in the active turn. |
+
+### Multi-Agent Teamwork (`/teamwork-preview`)
+
+For large software projects and multi-file refactoring campaigns, launch collaborative agent teams:
+
+```bash
+/teamwork-preview
+```
+
+Coordinated teams handle milestone decomposition, parallel implementation across worktrees, and independent verification checks.
+
+---
+
+## 4.4 — Parallel Execution Patterns <span class="duration-badge">10 min</span>
 
 ### Parallel Audit Pattern
 
 ```text
-> Spawn three subagents in parallel:
-> 1. Security audit — scan for hardcoded credentials, injection risks, and insecure dependencies
-> 2. Performance audit — find N+1 queries, unindexed lookups, and memory leaks
-> 3. Coverage audit — identify untested functions and missing integration tests
+> Spawn three subagents in parallel using branch workspace mode:
+> 1. Security auditor — scan for hardcoded credentials, injection risks, and insecure dependencies
+> 2. Performance auditor — find N+1 queries, unindexed lookups, and memory leaks
+> 3. Coverage auditor — identify untested functions and missing integration tests
 >
-> Use branch workspace mode for each. Report back when all three complete.
+> Report back when all three complete with a synthesized findings summary.
 ```
-
-Watch three independent analyses run simultaneously. When they finish, agy synthesizes the results.
-
-!!! tip "The Wow Moment"
-    Three specialized agents running in parallel on your codebase, each with full context, each producing independent findings. This is the pattern that makes agy qualitatively different from a chat-based assistant.
 
 ### Adversarial Review Pattern
 
 ```text
 > Spawn a subagent to act as an adversarial reviewer for the changes in this branch.
 > Its only job: find reasons why this code should NOT be merged.
-> It should challenge every assumption and look for edge cases the implementer missed.
+> Challenge every assumption, probe concurrency edge cases, and be skeptical of everything.
 ```
-
-The adversarial reviewer pattern is particularly powerful for security-sensitive changes, infrastructure modifications, or any PR where "looks good to me" isn't sufficient.
 
 ---
 

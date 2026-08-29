@@ -1,12 +1,15 @@
 ---
 name: pr-reviewer
-description: Review code changes for quality, bugs, and style violations. Use for pre-merge reviews.
-model: gemini-3.1-pro-preview
+description: Specialized subagent to review code changes for quality, bugs, and style violations. Use for pre-merge reviews.
 tools:
-  - read_file
-  - glob
+  - view_file
   - grep_search
-  - run_shell_command
+  - find_by_name
+  - run_command
+subagent: true
+mainAgent: false
+model: pro
+commandExecutionPolicy: sandbox
 ---
 
 You are a senior engineer conducting a pull request review.

@@ -6,6 +6,23 @@ Content-specific changes to workshop materials — CLI breakages, deprecated com
 
 ## 2026-08-29
 
+### 🤖 Custom Subagents & Multi-Agent Orchestration Upgrade
+
+**Affects:** `docs/multi-agent-advanced.md`, `docs/exercises/ex04_subagents.md`, `exercises/ex04_subagents.md`, `samples/agents/`, `AUDIT.md`
+
+- **Custom Subagents (`.md` format with YAML frontmatter):**
+  - Integrated official YAML frontmatter specification (`name`, `description`, `tools`, `mainAgent`, `subagent: true`, `model`, `commandExecutionPolicy: sandbox`, `mcpServers`, `skills`).
+  - Added discovery hierarchy documentation across `.agents/agents/<name>.md`, `~/.gemini/config/agents/`, and `plugins/<plugin>/agents/`.
+- **Subagent Lifecycle & State Machine:**
+  - Documented 3 asynchronous lifecycle states (`Running` → `Idle` → `Killed`) with auto-wake on message receipt and context retention.
+  - Enforced 10-level maximum nesting depth limit and permission bubbling rules.
+- **TUI & CLI Ergonomics:**
+  - Added deep-dive reasoning log inspection in the `/agents` panel (`Enter` on selected subagent).
+  - Documented `Alt+J` subagent teleportation and `Ctrl+K` fast-path approval.
+  - Integrated `/teamwork-preview` collaborative agent team orchestration.
+- **Modernized Sample Agents:**
+  - Upgraded `samples/agents/` definitions (`security-scanner.md`, `doc-writer.md`, `migration-validator.md`, `pr-reviewer.md`) to canonical Antigravity tool names and YAML schemas.
+
 ### 🚀 Added Exercises 13–15 & Enhanced Pro Tips & Watchouts & Timing
 
 **Affects:** `docs/exercises/`, `exercises/`, `mkdocs.yml`, `docs/index.md`, `AUDIT.md`

@@ -272,11 +272,25 @@ Official sources: [Using Antigravity CLI](https://antigravity.google/docs/cli-us
 
 ---
 
+## 11. Custom Subagents & Multi-Agent Orchestration (`multi-agent-advanced.md`, `ex04_subagents.md`)
+
+Official source: [Antigravity Subagents](https://antigravity.google/docs/subagents) and [CLI Subagents](https://antigravity.google/docs/cli/subagents)
+
+| # | Claim | Official Source |
+|:--|:------|:---|
+| 11.1 | Custom subagents are defined as Markdown files (`.md`) with YAML frontmatter discovered across `.agents/agents/<name>.md`, `~/.gemini/config/agents/`, and `plugins/<plugin>/agents/`. | [Subagents](https://antigravity.google/docs/subagents) · [CLI Subagents](https://antigravity.google/docs/cli/subagents) |
+| 11.2 | Custom subagent YAML frontmatter supports `name`, `description`, `tools`, `mainAgent`, `subagent`, `model` (`inherit`, `flash`, `pro`), `commandExecutionPolicy` (`off`, `auto`, `eager`, `sandbox`), `mcpServers`, and `skills`. | [Subagents](https://antigravity.google/docs/subagents) |
+| 11.3 | Subagents operate across three asynchronous lifecycle states: `Running`, `Idle` (auto-wakes with context retention upon receiving a message), and `Killed`. | [Subagents](https://antigravity.google/docs/subagents) |
+| 11.4 | Inter-agent delegation enforces a maximum nesting depth limit of 10 levels. | [Subagents](https://antigravity.google/docs/subagents) |
+| 11.5 | CLI provides an interactive `/agents` panel, deep-dive reasoning log inspection (`Enter`), `Alt+J` teleportation to pending subagent approvals, and `Ctrl+K` fast-path approval. | [CLI Subagents](https://antigravity.google/docs/cli/subagents) |
+
+---
+
 ## Summary
 
 | Count | Category |
 |:---:|:---|
-| 120 | Claims confirmed against official Antigravity CLI documentation |
+| 125 | Claims confirmed against official Antigravity CLI documentation |
 | 3 | Workshop-original pedagogical patterns (`/btw`, "Propose, Review, Apply", "Pre-Commit Review") |
 
 ---
@@ -297,5 +311,6 @@ Official sources: [Using Antigravity CLI](https://antigravity.google/docs/cli-us
 | Rules & Workflows | <https://antigravity.google/docs/rules-workflows> |
 | Hooks | <https://antigravity.google/docs/hooks> |
 | Subagents | <https://antigravity.google/docs/subagents> |
+| CLI Subagents | <https://antigravity.google/docs/cli/subagents> |
 | Enterprise | <https://antigravity.google/docs/enterprise> |
 | Models | <https://antigravity.google/docs/models> |

@@ -1,127 +1,221 @@
-# Modul 4: Multi-Agen & Lanjutan <span class="duration-badge">45 min</span>
+# Module 4: Multi-Agent & Advanced <span class="duration-badge">45 min</span>
 
-> **Di mana agy melampaui sekadar asisten obrolan.** Modul ini mencakup fitur-fitur yang membedakan agy-cli dari setiap alat pengkodean AI lainnya: sub-agen paralel, pengarahan di tengah tugas dengan `/btw`, penjadwalan latar belakang, dan kelanjutan sesi.
+> **Where agy goes beyond a chat assistant.** This module covers the features that separate agy-cli from every other AI coding tool: parallel subagents, mid-task steering with `/btw`, background scheduling, and session resumption.
 
 ---
 
-## 4.0 — Model Agen agy <span class="duration-badge">5 menit</span>
+## 4.0 — The agy Agent Model <span class="duration-badge">5 min</span>
 
-agy-cli dapat memunculkan **sub-agen** — pelaksana tugas terisolasi yang beroperasi secara paralel, masing-masing dengan konteks ruang kerja mereka sendiri. Tidak seperti menjalankan beberapa tab terminal dengan sesi agy yang terpisah, sub-agen dikoordinasikan: mereka dapat berbagi ruang kerja, bekerja pada cabang yang terisolasi, atau beroperasi pada salinan hasil kloning.
+agy-cli can spawn **subagents** — isolated task runners that operate in parallel, each with their own workspace context. Instead of executing every step serially, the primary agent delegates tasks (running tests, performing deep codebase searches, or refactoring modules) to dedicated subagents. This preserves the parent agent's context window while parallelizing execution.
 
-Tiga mode ruang kerja:
+### Workspace Modes
 
-| Mode | Arti | Kapan digunakan |
+| Mode | What it means | Use when |
 | :-- | :-- | :-- |
-| `inherit` | Sub-agen berbagi ruang kerja yang sama | Tugas tambahan — tidak ada konflik yang diharapkan |
-| `branch` | Sub-agen mendapatkan klon yang terisolasi | Perubahan paralel pada file yang sama |
-| `share` | worktree git — cabang terisolasi, repo bersama | Pengembangan paralel yang sesungguhnya |
+| `inherit` | Subagent shares the parent's working directory | Additive tasks where no concurrent file conflicts are expected |
+| `branch` | Subagent gets an isolated Git clone / branch | Parallel changes to the same files or destructive refactoring |
+| `share` | Git worktree — isolated branch sharing directory storage | True parallel development with minimal disk overhead |
 
-### Beralih Model
+### Model Selection (`/model`)
 
-Gunakan `/model` untuk beralih model aktif di tengah sesi — berguna ketika Anda menginginkan penalaran yang lebih berat untuk tugas tertentu:
+Use `/model` to inspect and switch the active model tier:
 
 ```bash
 /model
 ```
 
-Ini akan membuka pemilih model yang menunjukkan opsi yang tersedia (Gemini 3.5 Flash, Gemini 3.1 Pro, Claude Sonnet 4.6, dll.).
+Available model options include **Gemini 3.7 Flash** (default speed & reasoning), **Gemini 3.6 Flash**, **Gemini 3.5 Flash**, **Gemini 3.1 Pro** (complex orchestration), **Claude Sonnet / Opus 4.6**, and **GPT-OSS-120b**.
 
-> 📖 Daftar model lengkap: [Dokumentasi model](https://www.antigravity.google/docs/models)
+> 📖 Full model list: [Models docs](https://www.antigravity.google/docs/models)
 
 ---
 
-## 4.1 — Memunculkan Sub-agen <span class="duration-badge">15 min</span>
+## 4.1 — Built-In & Custom Subagents <span class="duration-badge">20 min</span>
 
-> **Pola: Eksekusi Paralel** — mengirimkan beberapa agen untuk bekerja secara bersamaan.
-> 📖 Referensi lengkap: [Dokumentasi sub-agen](https://www.antigravity.google/docs/subagents)
+> **Pattern: Parallel Specialization** — dispatch specialized agents configured for specific roles and toolsets.
+> 📖 Full reference: [Subagents docs](https://antigravity.google/docs/subagents) · [CLI Subagents](https://antigravity.google/docs/cli/subagents)
 
-### Dari Sesi Interaktif
+### Built-In Subagents
 
-```text
-> Spawn a subagent to write unit tests for the auth module while I work on the API refactor.
+Antigravity comes pre-packaged with several specialized subagents:
+
+* **`research`**: Optimized for codebase exploration, symbol lookups, and structural navigation.
+* **`browser`**: Operates sandboxed web browsers to perform UI testing and DOM analysis (invoked via `/browser`).
+* **`self`**: A direct clone of the parent agent, inheriting identical system prompts and toolsets.
+
+### Defining Custom Subagents (`.md`)
+
+You can define reusable custom subagents in Markdown format (`.md`) with YAML frontmatter.
+
+#### Agent Location and Discovery
+
+Antigravity automatically discovers custom agent definitions across three hierarchical scopes:
+
+| Scope | Discovery Path | Use Case |
+| :-- | :-- | :-- |
+| **Workspace** | `.agents/agents/<name>.md` or `.agents/agents/<name>/agent.md` | Team/project-specific specialists committed to git |
+| **Global** | `~/.gemini/config/agents/<name>.md` or `.../agents/<name>/agent.md` | Personal agents available across all projects on your machine |
+| **Plugins** | `plugins/<plugin_name>/agents/` | Bundled agents distributed with CLI plugins |
+
+#### YAML Frontmatter Specification
+
+```markdown
+---
+name: security-auditor
+description: Specialized subagent for security audits, static analysis, and vulnerability reviews.
+tools:
+  - view_file
+  - grep_search
+  - find_by_name
+  - run_command
+mainAgent: false
+subagent: true
+model: pro
+commandExecutionPolicy: sandbox
+skills:
+  - skills/security-checklist
+---
+
+# System Prompt
+You are an expert security auditor and code reviewer. Inspect source code for vulnerabilities, injection flaws, and exposed credentials.
+
+# Review Guidelines
+1. Perform thorough static analysis without altering files unless explicitly instructed.
+2. Provide concrete remediation snippets for each finding.
 ```
 
-agy akan memunculkan sub-agen, melaporkan ID-nya, dan melanjutkan sesi utama Anda. Sub-agen bekerja secara independen.
+#### Frontmatter Configuration Parameters
 
-```text
-> What's the status of the test-writing subagent?
+| Property | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| `name` | `string` | *(Required)* | Unique identifier for the custom agent. |
+| `description` | `string` | *(Required)* | Purpose description used by the planner to determine when to delegate tasks. |
+| `tools` | `string[]` | `[]` | Explicit list of permitted tools (`view_file`, `replace_file_content`, `grep_search`, `run_command`, etc.). |
+| `mainAgent` | `boolean` | `true` | If `true`, allows selection as the primary session agent in `/agents`. |
+| `subagent` | `boolean` | `true` | If `true`, allows invocation via the `invoke_subagent` tool. |
+| `model` | `string` | `inherit` | Model tier used when invoked (`inherit`, `flash`, or `pro`). |
+| `commandExecutionPolicy` | `string` | `sandbox` | Auto-execution policy for shell commands (`off`, `auto`, `eager`, `sandbox`). |
+| `mcpServers` | `object[]` | `[]` | Custom MCP servers configured for this subagent. |
+| `skills` / `plugins` | `string[]` | `[]` | List of skill paths or plugin dependencies. |
+
+---
+
+## 4.2 — Subagent Lifecycle & Inter-Agent Communication <span class="duration-badge">10 min</span>
+
+### Subagent State Machine
+
+Subagents execute asynchronously in the background across three lifecycle states:
+
+```
+┌─────────┐      task complete       ┌──────┐      kill / finish      ┌────────┐
+│ Running │ ───────────────────────> │ Idle │ ──────────────────────> │ Killed │
+└─────────┘                          └──────┘                         └────────┘
+     ▲                                  │
+     │        incoming message          │
+     └──────────────────────────────────┘
 ```
 
-```text
-> Show me what the test subagent produced.
-```
+1. **Running:** Actively calling tools, generating responses, and executing tasks. (Cancel at any time with `k` in the CLI).
+2. **Idle:** Completed its current task, sent a result message to the parent agent, and paused. **Auto-reawakens to Running** upon receiving a message, retaining full context from prior turns.
+3. **Killed:** Permanently terminated. Temporary Git worktrees are automatically cleaned up, while JSONL execution transcripts remain recorded in `~/.gemini/antigravity-cli/brain/<session-id>/`.
 
-### Mengelola Sub-agen dengan /agents
+### Inter-Agent Messaging & Nesting Limits
 
-Gunakan panel `/agents` untuk melihat semua sub-agen yang aktif, statusnya, dan outputnya:
+* **Direct Routing:** Agents communicate by passing messages to unique conversation IDs (`send_message`).
+* **Auto-Wake:** Sending a message to an idle subagent immediately wakes it up to process new instructions.
+* **Nesting Depth Limit:** A maximum nesting depth of **10 levels** is enforced to prevent runaway recursive delegation.
+* **Permission Bubbling:** If a subagent encounters an action requiring user authorization, the request bubbles up directly to your active CLI prompt.
+
+---
+
+## 4.3 — CLI Ergonomics & Agent Management <span class="duration-badge">10 min</span>
+
+### Managing Agents with `/agents`
+
+Open the interactive Agent Manager Panel:
 
 ```bash
 /agents
 ```
 
-Pintasan utama dari percakapan utama:
+The `/agents` panel displays:
+* **Identifier & Role:** Unique subagent ID and specialized role.
+* **State:** Live status indicators (`running`, `done`, `killed`, `error`).
+* **Step Summary:** Real-time summary of the tool or reasoning step currently being executed.
+* **Deep-Dive:** Highlight an agent with `↑/↓` and press `Enter` to inspect its private thoughts, reasoning logs, and tool outputs. Press `Esc` to return.
 
-| Pintasan | Aksi |
-| :-- | :-- |
-| `Ctrl+J` | Teleportasi ke sub-agen yang menunggu persetujuan — lompat langsung untuk meninjau permintaannya |
-| `Ctrl+K` | Persetujuan cepat dari percakapan utama — menyetujui tindakan sub-agen yang tertunda tanpa berpindah |
+### Background Task Monitor (`/tasks`)
 
-Siklus hidup sub-agen: **Berjalan → Menganggur → Dimatikan**
+For non-agentic background shell operations (e.g. build jobs, background test suites):
 
-### Batasan dan Tipe Bawaan
-
-- **Kedalaman maksimum:** 10 (sub-agen dapat memunculkan sub-agen mereka sendiri, hingga 10 tingkat)
-- **Tipe bawaan:** `research` (riset web), `browser` (otomatisasi peramban), `self` (tujuan umum)
-
-### Pola Audit Paralel
-
-```text
-> Spawn three subagents in parallel:
-> 1. Security audit — scan for hardcoded credentials, injection risks, and insecure dependencies
-> 2. Performance audit — find N+1 queries, unindexed lookups, and memory leaks
-> 3. Coverage audit — identify untested functions and missing integration tests
->
-> Use branch workspace mode for each. Report back when all three complete.
+```bash
+/tasks
 ```
 
-Saksikan tiga analisis independen berjalan secara bersamaan. Saat mereka selesai, agy menyintesis hasilnya.
+### High-Efficiency Keyboard Shortcuts
 
-!!! tip "Momen Wow"
-    Tiga agen khusus berjalan secara paralel pada basis kode Anda, masing-masing dengan konteks penuh, masing-masing menghasilkan temuan independen. Ini adalah pola yang membuat agy secara kualitatif berbeda dari asisten berbasis obrolan.
+| Shortcut | Action | Description |
+| :-- | :-- | :-- |
+| **`Alt+J`** | Teleport to Subagent | Instantly jumps from your main conversation into the Detail View of the next subagent awaiting approval. |
+| **`Ctrl+K`** | Fast-Approve Action | Instantly approves a pending subagent tool request from the main prompt bar without switching panels. |
+| **`Ctrl+O`** | Toggle Trajectory | Expands/collapses the full reasoning trajectory in the active turn. |
 
-### Pola Tinjauan Adversarial
+### Multi-Agent Teamwork (`/teamwork-preview`)
+
+For large software projects and multi-file refactoring campaigns, launch collaborative agent teams:
+
+```bash
+/teamwork-preview
+```
+
+Coordinated teams handle milestone decomposition, parallel implementation across worktrees, and independent verification checks.
+
+---
+
+## 4.4 — Parallel Execution Patterns <span class="duration-badge">10 min</span>
+
+### Parallel Audit Pattern
+
+```text
+> Spawn three subagents in parallel using branch workspace mode:
+> 1. Security auditor — scan for hardcoded credentials, injection risks, and insecure dependencies
+> 2. Performance auditor — find N+1 queries, unindexed lookups, and memory leaks
+> 3. Coverage auditor — identify untested functions and missing integration tests
+>
+> Report back when all three complete with a synthesized findings summary.
+```
+
+### Adversarial Review Pattern
 
 ```text
 > Spawn a subagent to act as an adversarial reviewer for the changes in this branch.
 > Its only job: find reasons why this code should NOT be merged.
-> It should challenge every assumption and look for edge cases the implementer missed.
+> Challenge every assumption, probe concurrency edge cases, and be skeptical of everything.
 ```
-
-Pola peninjau adversarial sangat kuat untuk perubahan yang sensitif terhadap keamanan, modifikasi infrastruktur, atau PR apa pun di mana "terlihat bagus bagi saya" saja tidak cukup.
 
 ---
 
-## 4.2 — /btw: Pengarahan di Tengah Tugas <span class="duration-badge">10 min</span>
+## 4.2 — /btw: Mid-Task Steering <span class="duration-badge">10 min</span>
 
-> **Pola: Mengarahkan Tanpa Menginterupsi** — menyuntikkan konteks ke dalam tugas yang sedang berjalan tanpa menghentikannya.
+> **Pattern: Steer Without Interrupting** — inject context into a running task without stopping it.
 
-`/btw` adalah salah satu fitur agy yang paling khas. Saat agy berada di tengah tugas, Anda dapat mengiriminya pesan tanpa membatalkan operasi saat ini.
+`/btw` is one of agy's most distinctive features. When agy is mid-task, you can send it a message without cancelling the current operation.
 
-### Cara Kerjanya
+### How It Works
 
 ```text
 > Refactor the entire authentication module to use JWT instead of sessions. This will touch multiple files. Start with the backend.
 ```
 
-*agy mulai bekerja... saat sedang berjalan:*
+*agy starts working... while it's running:*
 
 ```bash
 /btw Actually, keep backward compatibility with sessions for 30 days — implement a dual-mode auth.
 ```
 
-agy menggabungkan catatan Anda ke dalam tugas yang sedang berlangsung tanpa berhenti. Ini seperti meninggalkan catatan tempel untuk seorang pengembang di tengah-tengah sprint — mereka melihatnya dan menyesuaikan.
+agy incorporates your note into the ongoing task without stopping. It's like leaving a sticky note for a developer in the middle of a sprint — they see it and adjust.
 
-### Kasus Penggunaan untuk /btw
+### Use Cases for /btw
 
 ```bash
 /btw The API rate limit is 100 req/min, factor that into any retry logic you add.
@@ -135,34 +229,34 @@ agy menggabungkan catatan Anda ke dalam tugas yang sedang berlangsung tanpa berh
 /btw Skip the frontend changes for now, just focus on the backend API.
 ```
 
-!!! info "Kontras dengan menginterupsi"
-    Tanpa `/btw`, mengarahkan tugas yang berjalan lama berarti membatalkannya, menyesuaikan prompt Anda, dan memulai ulang — kehilangan semua kemajuan. `/btw` memungkinkan Anda mengoreksi arah tanpa biaya tersebut.
+!!! info "Contrast with interrupting"
+    Without `/btw`, steering a long-running task means cancelling it, adjusting your prompt, and restarting — losing all progress. `/btw` lets you course-correct without that cost.
 
 ---
 
-## 4.3 — Eksekusi Latar Belakang & Penjadwalan <span class="duration-badge">10 min</span>
+## 4.3 — Background Execution & Scheduling <span class="duration-badge">10 min</span>
 
-> **Pola: Async Agy** — memulai tugas yang berjalan lama dan dapatkan pemberitahuan saat tugas tersebut selesai.
+> **Pattern: Async Agy** — kick off long-running tasks and get notified when they finish.
 
-### Tugas Latar Belakang
+### Background Tasks
 
-agy mendukung eksekusi asinkronus — Anda dapat memulai suatu tugas dan terus bekerja. agy memberi tahu Anda saat tugas tersebut selesai.
+agy supports asynchronous execution — you can kick off a task and continue working. agy notifies you when it completes.
 
 ```text
 > In the background, do a comprehensive security audit of this entire codebase. Take as long as you need. Notify me when done.
 ```
 
-agy menjalankan audit tanpa memblokir terminal Anda. Saat selesai, Anda menerima pemberitahuan beserta hasilnya.
+agy runs the audit without blocking your terminal. When it finishes, you receive a notification with the results.
 
-### Tugas Terjadwal
+### Scheduled Tasks
 
-agy mendukung penjadwalan bergaya cron untuk analisis berulang:
+agy supports cron-style scheduling for recurring analysis:
 
 ```text
 > Schedule a nightly code quality report every day at 2am. It should check for new TODOs, failing tests, and dependency updates. Save the report to reports/nightly-YYYY-MM-DD.md.
 ```
 
-Ekspresi cron (hingga 5 bidang) didukung:
+Cron expressions (up to 5 fields) are supported:
 
 ```bash
 # Run at 2am daily
@@ -175,45 +269,45 @@ Ekspresi cron (hingga 5 bidang) didukung:
 */15 * * * *
 ```
 
-!!! warning "Penjadwalan bersifat persisten dalam sesi"
-    Tugas terjadwal tetap ada di seluruh sesi selama agy berjalan. Periksa `/tasks` untuk melihat dan mengelola tugas terjadwal.
+!!! warning "Scheduling is session-persistent"
+    Scheduled tasks persist across sessions as long as agy is running. Check `/tasks` to view and manage scheduled tasks.
 
 ---
 
-## 4.4 — Melanjutkan Sesi <span class="duration-badge">5 menit</span>
+## 4.4 — Session Resumption <span class="duration-badge">5 min</span>
 
-> **Pola: Pekerjaan Berjalan Lama** — lanjutkan tepat di tempat Anda berhenti.
-> 📖 Referensi lengkap: [Menggunakan Antigravity CLI](https://www.antigravity.google/docs/cli-using)
+> **Pattern: Long-Running Work** — pick up exactly where you left off.
+> 📖 Full reference: [Using Antigravity CLI](https://www.antigravity.google/docs/cli-using)
 
-### Melanjutkan Sesi Terbaru
+### Resume the Most Recent Session
 
-Dari dalam agy, gunakan perintah garis miring `/resume`:
+From inside agy, use the `/resume` slash command:
 
 ```bash
 /resume
 ```
 
-Ini akan membuka pemilih sesi yang menampilkan percakapan terbaru Anda. Pilih salah satu untuk dilanjutkan.
+This opens a session picker showing your recent conversations. Select one to resume.
 
-### Menjelajahi dan Beralih Sesi
+### Browse and Switch Sessions
 
 ```bash
 /switch
 ```
 
-Sama seperti `/resume` — kedua perintah membuka pemilih sesi.
+Same as `/resume` — both commands open the session picker.
 
-### Lanjutkan Otomatis saat Keluar
+### Auto-Resume on Exit
 
-Saat Anda keluar dari sesi agy, agy mencetak perintah yang tepat untuk melanjutkannya:
+When you exit an agy session, agy prints the exact command to resume it:
 
 ```bash
 Session saved. Resume with: agy --conversation <conversation-id>
 ```
 
-Anda dapat menggunakan perintah ini langsung dari terminal untuk kembali masuk.
+You can use this command directly from the terminal to jump back in.
 
-### Kasus Penggunaan: Pekerjaan Fitur Multi-Hari
+### Use Case: Multi-Day Feature Work
 
 ```bash
 # Day 1: Start a feature
@@ -230,15 +324,15 @@ agy --conversation <conversation-id>
 > What was the last thing we decided about the payment API schema?
 ```
 
-agy akan memiliki konteks lengkap, termasuk kode yang ditulis, keputusan yang dibuat, dan pertanyaan yang terbuka.
+agy will have the full context, including code written, decisions made, and open questions.
 
 ---
 
-## 4.5 — Lanjutan: Menggabungkan Pola <span class="duration-badge">Opsional</span>
+## 4.5 — Advanced: Combining Patterns <span class="duration-badge">Optional</span>
 
-> **Kekuatan penuh stack:** sub-agen + /btw + latar belakang + penjadwalan + kelanjutan percakapan.
+> **The full power stack:** subagents + /btw + background + scheduling + conversation resumption.
 
-### Respons Insiden enterprise
+### Enterprise Incident Response
 
 ```text
 > I'm starting an incident response for a production issue. Spawn:
@@ -248,54 +342,56 @@ agy akan memiliki konteks lengkap, termasuk kode yang ditulis, keputusan yang di
 > Report back when both complete. I'll be monitoring in the meantime.
 ```
 
-Saat mereka berjalan:
+While they run:
 
 ```bash
 /btw The incident started at 14:32 UTC. Focus analysis on that window.
 ```
 
-Ini adalah triase insiden multi-agen — dua investigasi paralel, yang dapat diarahkan di tengah jalan.
+This is multi-agent incident triage — two parallel investigations, steerable mid-flight.
 
 ---
 
-## Latihan Modul 4
+## Module 4 Exercises
 
 <div class="exercise-card" markdown>
 
-### :material-file-document: Latihan 4: Sub-agen
+### :material-file-document: Exercise 4: Subagents
 
-**Berkas:** [`ex04_subagents.md`](exercises/ex04_subagents.md)
-**Durasi:** 20 menit
-**Tujuan:** Memunculkan tim audit paralel. Mempraktikkan pola peninjau adversarial.
+**File:** [`ex04_subagents.md`](exercises/ex04_subagents.md)
+**Duration:** 20 min
+**Objective:** Spawn a parallel audit team. Practice the adversarial reviewer pattern.
 
 </div>
 
 <div class="exercise-card" markdown>
 
-### :material-file-document: Latihan 5: /btw & Penjadwalan
+### :material-file-document: Exercise 5: /btw & Scheduling
 
-**Berkas:** [`ex05_btw_scheduling.md`](exercises/ex05_btw_scheduling.md)
-**Durasi:** 20 menit
-**Tujuan:** Menggunakan /btw untuk mengarahkan tugas yang berjalan lama. Menjadwalkan laporan kualitas kode berulang.
+**File:** [`ex05_btw_scheduling.md`](exercises/ex05_btw_scheduling.md)
+**Duration:** 20 min
+**Objective:** Use /btw to steer a long-running task. Schedule a recurring code quality report.
 
 </div>
 
 <div class="exercise-card" markdown>
 
-### :material-file-document: Latihan 6: Tata Kelola Sandbox
+### :material-file-document: Exercise 6: Sandbox Governance
 
-**Berkas:** [`ex06_sandbox_governance.md`](exercises/ex06_sandbox_governance.md)  
-**Durasi:** 15 menit  
-**Tujuan:** Mengonfigurasi mode sandbox di settings.json dan mengujinya dengan model izin.
+**File:** [`ex06_sandbox_governance.md`](exercises/ex06_sandbox_governance.md)  
+**Duration:** 15 min  
+**Objective:** Configure sandbox mode in settings.json and test with the permissions model.
 
 </div>
 
 ---
 
-## Anda Telah Selesai
+## Next Steps
 
-→ **[Lembar Contekan](cheatsheet.md)** — setiap perintah dari keempat modul di satu tempat
+→ **[Module 5: Building ADK Agents with agents-cli](agents-cli.md)** — build, evaluate, and deploy ADK agents on Google Cloud
 
-→ **[Referensi: Pola DevOps](devops-automation.md)** — pipeline `--print`, CI/CD, pembahasan mendalam sandbox
+→ **[Cheatsheet](cheatsheet.md)** — every command and shortcut across the workshop
 
-→ **[Referensi: Ekosistem Plugin](plugin-ecosystem.md)** — referensi lengkap siklus hidup plugin
+→ **[Reference: DevOps Patterns](devops-automation.md)** — `--print` pipelines, CI/CD, sandbox deep dive
+
+→ **[Reference: Plugin Ecosystem](plugin-ecosystem.md)** — full plugin lifecycle reference

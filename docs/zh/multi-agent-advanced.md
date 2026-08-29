@@ -1,127 +1,221 @@
-# 模块 4：多代理与高级功能 <span class="duration-badge">45 分钟</span>
+# Module 4: Multi-Agent & Advanced <span class="duration-badge">45 min</span>
 
-> **agy 超越聊天助手之处。** 本模块涵盖了使 agy-cli 区别于所有其他 AI 编码工具的功能：并行子代理、使用 `/btw` 进行任务中途的模型引导、后台调度以及会话恢复。
+> **Where agy goes beyond a chat assistant.** This module covers the features that separate agy-cli from every other AI coding tool: parallel subagents, mid-task steering with `/btw`, background scheduling, and session resumption.
 
 ---
 
-## 4.0 — agy 代理模型 <span class="duration-badge">5 分钟</span>
+## 4.0 — The agy Agent Model <span class="duration-badge">5 min</span>
 
-agy-cli 可以生成**子代理**——并行运行的隔离任务运行器，每个都有自己的工作区上下文。与运行带有独立 agy 会话的多个终端选项卡不同，子代理是协调的：它们可以共享工作区、在隔离的分支上工作，或者在克隆的副本上操作。
+agy-cli can spawn **subagents** — isolated task runners that operate in parallel, each with their own workspace context. Instead of executing every step serially, the primary agent delegates tasks (running tests, performing deep codebase searches, or refactoring modules) to dedicated subagents. This preserves the parent agent's context window while parallelizing execution.
 
-三种工作区模式：
+### Workspace Modes
 
-| 模式 | 含义 | 适用场景 |
+| Mode | What it means | Use when |
 | :-- | :-- | :-- |
-| `inherit` | 子代理共享同一个工作区 | 附加任务——预期不会发生冲突 |
-| `branch` | 子代理获取一个隔离的克隆 | 对相同文件的并行更改 |
-| `share` | git 工作树——隔离的分支，共享的仓库 | 真正的并行开发 |
+| `inherit` | Subagent shares the parent's working directory | Additive tasks where no concurrent file conflicts are expected |
+| `branch` | Subagent gets an isolated Git clone / branch | Parallel changes to the same files or destructive refactoring |
+| `share` | Git worktree — isolated branch sharing directory storage | True parallel development with minimal disk overhead |
 
-### 切换模型
+### Model Selection (`/model`)
 
-使用 `/model` 在会话中途切换活动模型——当您需要对特定任务进行更深度的推理时非常有用：
+Use `/model` to inspect and switch the active model tier:
 
 ```bash
 /model
 ```
 
-这将打开一个模型选择器，显示可用选项（Gemini 3.5 Flash、Gemini 3.1 Pro、Claude Sonnet 4.6 等）。
+Available model options include **Gemini 3.7 Flash** (default speed & reasoning), **Gemini 3.6 Flash**, **Gemini 3.5 Flash**, **Gemini 3.1 Pro** (complex orchestration), **Claude Sonnet / Opus 4.6**, and **GPT-OSS-120b**.
 
-> 📖 完整模型列表：[模型文档](https://www.antigravity.google/docs/models)
+> 📖 Full model list: [Models docs](https://www.antigravity.google/docs/models)
 
 ---
 
-## 4.1 — 派生子代理 <span class="duration-badge">15 min</span>
+## 4.1 — Built-In & Custom Subagents <span class="duration-badge">20 min</span>
 
-> **模式：并行执行** — 调度多个代理同时工作。
-> 📖 完整参考：[子代理文档](https://www.antigravity.google/docs/subagents)
+> **Pattern: Parallel Specialization** — dispatch specialized agents configured for specific roles and toolsets.
+> 📖 Full reference: [Subagents docs](https://antigravity.google/docs/subagents) · [CLI Subagents](https://antigravity.google/docs/cli/subagents)
 
-### 来自交互式会话
+### Built-In Subagents
 
-```text
-> Spawn a subagent to write unit tests for the auth module while I work on the API refactor.
+Antigravity comes pre-packaged with several specialized subagents:
+
+* **`research`**: Optimized for codebase exploration, symbol lookups, and structural navigation.
+* **`browser`**: Operates sandboxed web browsers to perform UI testing and DOM analysis (invoked via `/browser`).
+* **`self`**: A direct clone of the parent agent, inheriting identical system prompts and toolsets.
+
+### Defining Custom Subagents (`.md`)
+
+You can define reusable custom subagents in Markdown format (`.md`) with YAML frontmatter.
+
+#### Agent Location and Discovery
+
+Antigravity automatically discovers custom agent definitions across three hierarchical scopes:
+
+| Scope | Discovery Path | Use Case |
+| :-- | :-- | :-- |
+| **Workspace** | `.agents/agents/<name>.md` or `.agents/agents/<name>/agent.md` | Team/project-specific specialists committed to git |
+| **Global** | `~/.gemini/config/agents/<name>.md` or `.../agents/<name>/agent.md` | Personal agents available across all projects on your machine |
+| **Plugins** | `plugins/<plugin_name>/agents/` | Bundled agents distributed with CLI plugins |
+
+#### YAML Frontmatter Specification
+
+```markdown
+---
+name: security-auditor
+description: Specialized subagent for security audits, static analysis, and vulnerability reviews.
+tools:
+  - view_file
+  - grep_search
+  - find_by_name
+  - run_command
+mainAgent: false
+subagent: true
+model: pro
+commandExecutionPolicy: sandbox
+skills:
+  - skills/security-checklist
+---
+
+# System Prompt
+You are an expert security auditor and code reviewer. Inspect source code for vulnerabilities, injection flaws, and exposed credentials.
+
+# Review Guidelines
+1. Perform thorough static analysis without altering files unless explicitly instructed.
+2. Provide concrete remediation snippets for each finding.
 ```
 
-agy 将派生一个子代理，报告其 ID，并继续您的主会话。该子代理独立工作。
+#### Frontmatter Configuration Parameters
 
-```text
-> What's the status of the test-writing subagent?
+| Property | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| `name` | `string` | *(Required)* | Unique identifier for the custom agent. |
+| `description` | `string` | *(Required)* | Purpose description used by the planner to determine when to delegate tasks. |
+| `tools` | `string[]` | `[]` | Explicit list of permitted tools (`view_file`, `replace_file_content`, `grep_search`, `run_command`, etc.). |
+| `mainAgent` | `boolean` | `true` | If `true`, allows selection as the primary session agent in `/agents`. |
+| `subagent` | `boolean` | `true` | If `true`, allows invocation via the `invoke_subagent` tool. |
+| `model` | `string` | `inherit` | Model tier used when invoked (`inherit`, `flash`, or `pro`). |
+| `commandExecutionPolicy` | `string` | `sandbox` | Auto-execution policy for shell commands (`off`, `auto`, `eager`, `sandbox`). |
+| `mcpServers` | `object[]` | `[]` | Custom MCP servers configured for this subagent. |
+| `skills` / `plugins` | `string[]` | `[]` | List of skill paths or plugin dependencies. |
+
+---
+
+## 4.2 — Subagent Lifecycle & Inter-Agent Communication <span class="duration-badge">10 min</span>
+
+### Subagent State Machine
+
+Subagents execute asynchronously in the background across three lifecycle states:
+
+```
+┌─────────┐      task complete       ┌──────┐      kill / finish      ┌────────┐
+│ Running │ ───────────────────────> │ Idle │ ──────────────────────> │ Killed │
+└─────────┘                          └──────┘                         └────────┘
+     ▲                                  │
+     │        incoming message          │
+     └──────────────────────────────────┘
 ```
 
-```text
-> Show me what the test subagent produced.
-```
+1. **Running:** Actively calling tools, generating responses, and executing tasks. (Cancel at any time with `k` in the CLI).
+2. **Idle:** Completed its current task, sent a result message to the parent agent, and paused. **Auto-reawakens to Running** upon receiving a message, retaining full context from prior turns.
+3. **Killed:** Permanently terminated. Temporary Git worktrees are automatically cleaned up, while JSONL execution transcripts remain recorded in `~/.gemini/antigravity-cli/brain/<session-id>/`.
 
-### 使用 /agents 管理子代理
+### Inter-Agent Messaging & Nesting Limits
 
-使用 `/agents` 面板查看所有活动的子代理、它们的状态和输出：
+* **Direct Routing:** Agents communicate by passing messages to unique conversation IDs (`send_message`).
+* **Auto-Wake:** Sending a message to an idle subagent immediately wakes it up to process new instructions.
+* **Nesting Depth Limit:** A maximum nesting depth of **10 levels** is enforced to prevent runaway recursive delegation.
+* **Permission Bubbling:** If a subagent encounters an action requiring user authorization, the request bubbles up directly to your active CLI prompt.
+
+---
+
+## 4.3 — CLI Ergonomics & Agent Management <span class="duration-badge">10 min</span>
+
+### Managing Agents with `/agents`
+
+Open the interactive Agent Manager Panel:
 
 ```bash
 /agents
 ```
 
-主对话中的关键快捷键：
+The `/agents` panel displays:
+* **Identifier & Role:** Unique subagent ID and specialized role.
+* **State:** Live status indicators (`running`, `done`, `killed`, `error`).
+* **Step Summary:** Real-time summary of the tool or reasoning step currently being executed.
+* **Deep-Dive:** Highlight an agent with `↑/↓` and press `Enter` to inspect its private thoughts, reasoning logs, and tool outputs. Press `Esc` to return.
 
-| 快捷键 | 操作 |
-| :-- | :-- |
-| `Ctrl+J` | 传送到等待批准的子代理 — 直接跳转以审查其请求 |
-| `Ctrl+K` | 从主对话中快速批准 — 无需切换即可批准子代理的待处理操作 |
+### Background Task Monitor (`/tasks`)
 
-子代理生命周期：**运行中 → 空闲 → 已终止**
+For non-agentic background shell operations (e.g. build jobs, background test suites):
 
-### 限制与内置类型
-
-- **最大深度：** 10（子代理可以派生自己的子代理，最多 10 层）
-- **内置类型：** `research`（网络研究）、`browser`（浏览器自动化）、`self`（通用）
-
-### 并行审计模式
-
-```text
-> Spawn three subagents in parallel:
-> 1. Security audit — scan for hardcoded credentials, injection risks, and insecure dependencies
-> 2. Performance audit — find N+1 queries, unindexed lookups, and memory leaks
-> 3. Coverage audit — identify untested functions and missing integration tests
->
-> Use branch workspace mode for each. Report back when all three complete.
+```bash
+/tasks
 ```
 
-观察三个独立的分析同时运行。当它们完成时，agy 会综合这些结果。
+### High-Efficiency Keyboard Shortcuts
 
-!!! tip "惊艳时刻"
-    三个专门的代理在您的代码库上并行运行，每个代理都拥有完整的上下文，每个代理都产生独立的发现。正是这种模式使 agy 与基于聊天的助手产生了质的区别。
+| Shortcut | Action | Description |
+| :-- | :-- | :-- |
+| **`Alt+J`** | Teleport to Subagent | Instantly jumps from your main conversation into the Detail View of the next subagent awaiting approval. |
+| **`Ctrl+K`** | Fast-Approve Action | Instantly approves a pending subagent tool request from the main prompt bar without switching panels. |
+| **`Ctrl+O`** | Toggle Trajectory | Expands/collapses the full reasoning trajectory in the active turn. |
 
-### 对抗性审查模式
+### Multi-Agent Teamwork (`/teamwork-preview`)
+
+For large software projects and multi-file refactoring campaigns, launch collaborative agent teams:
+
+```bash
+/teamwork-preview
+```
+
+Coordinated teams handle milestone decomposition, parallel implementation across worktrees, and independent verification checks.
+
+---
+
+## 4.4 — Parallel Execution Patterns <span class="duration-badge">10 min</span>
+
+### Parallel Audit Pattern
+
+```text
+> Spawn three subagents in parallel using branch workspace mode:
+> 1. Security auditor — scan for hardcoded credentials, injection risks, and insecure dependencies
+> 2. Performance auditor — find N+1 queries, unindexed lookups, and memory leaks
+> 3. Coverage auditor — identify untested functions and missing integration tests
+>
+> Report back when all three complete with a synthesized findings summary.
+```
+
+### Adversarial Review Pattern
 
 ```text
 > Spawn a subagent to act as an adversarial reviewer for the changes in this branch.
 > Its only job: find reasons why this code should NOT be merged.
-> It should challenge every assumption and look for edge cases the implementer missed.
+> Challenge every assumption, probe concurrency edge cases, and be skeptical of everything.
 ```
-
-对抗性审查模式对于安全敏感的更改、基础设施修改或任何仅仅一句“看起来不错 (looks good to me)”还不够的 PR 来说，特别强大。
 
 ---
 
-## 4.2 — /btw: 任务中途引导 <span class="duration-badge">10 分钟</span>
+## 4.2 — /btw: Mid-Task Steering <span class="duration-badge">10 min</span>
 
-> **模式：无中断引导** — 在不停止任务的情况下，将上下文注入到正在运行的任务中。
+> **Pattern: Steer Without Interrupting** — inject context into a running task without stopping it.
 
-`/btw` 是 agy 最具特色的功能之一。当 agy 处于任务中途时，您可以向它发送消息而无需取消当前操作。
+`/btw` is one of agy's most distinctive features. When agy is mid-task, you can send it a message without cancelling the current operation.
 
-### 工作原理
+### How It Works
 
 ```text
 > Refactor the entire authentication module to use JWT instead of sessions. This will touch multiple files. Start with the backend.
 ```
 
-*agy 开始工作……在它运行期间：*
+*agy starts working... while it's running:*
 
 ```bash
 /btw Actually, keep backward compatibility with sessions for 30 days — implement a dual-mode auth.
 ```
 
-agy 会在不停止的情况下将您的备注整合到正在进行的任务中。这就像在冲刺（sprint）中途给开发人员留下一张便利贴——他们看到后就会做出调整。
+agy incorporates your note into the ongoing task without stopping. It's like leaving a sticky note for a developer in the middle of a sprint — they see it and adjust.
 
-### /btw 的使用场景
+### Use Cases for /btw
 
 ```bash
 /btw The API rate limit is 100 req/min, factor that into any retry logic you add.
@@ -135,34 +229,34 @@ agy 会在不停止的情况下将您的备注整合到正在进行的任务中�
 /btw Skip the frontend changes for now, just focus on the backend API.
 ```
 
-!!! info "与中断的对比"
-    如果没有 `/btw`，引导一个长时间运行的任务意味着取消它、调整您的提示词并重新启动——从而丢失所有进度。`/btw` 让您无需付出这种代价即可纠正路线。
+!!! info "Contrast with interrupting"
+    Without `/btw`, steering a long-running task means cancelling it, adjusting your prompt, and restarting — losing all progress. `/btw` lets you course-correct without that cost.
 
 ---
 
-## 4.3 — 后台执行与调度 <span class="duration-badge">10 分钟</span>
+## 4.3 — Background Execution & Scheduling <span class="duration-badge">10 min</span>
 
-> **模式：异步 agy** — 启动长时间运行的任务，并在其完成时收到通知。
+> **Pattern: Async Agy** — kick off long-running tasks and get notified when they finish.
 
-### 后台任务
+### Background Tasks
 
-agy 支持异步执行 — 您可以启动任务并继续工作。agy 会在任务完成时通知您。
+agy supports asynchronous execution — you can kick off a task and continue working. agy notifies you when it completes.
 
 ```text
 > In the background, do a comprehensive security audit of this entire codebase. Take as long as you need. Notify me when done.
 ```
 
-agy 会在不阻塞终端的情况下运行审计。完成时，您将收到包含结果的通知。
+agy runs the audit without blocking your terminal. When it finishes, you receive a notification with the results.
 
-### 调度任务
+### Scheduled Tasks
 
-agy 支持用于定期分析的 cron 风格调度：
+agy supports cron-style scheduling for recurring analysis:
 
 ```text
 > Schedule a nightly code quality report every day at 2am. It should check for new TODOs, failing tests, and dependency updates. Save the report to reports/nightly-YYYY-MM-DD.md.
 ```
 
-支持 Cron 表达式（最多 5 个字段）：
+Cron expressions (up to 5 fields) are supported:
 
 ```bash
 # Run at 2am daily
@@ -175,45 +269,45 @@ agy 支持用于定期分析的 cron 风格调度：
 */15 * * * *
 ```
 
-!!! warning "调度具有会话持久性"
-    只要 agy 正在运行，调度任务就会跨会话持久存在。检查 `/tasks` 以查看和管理调度任务。
+!!! warning "Scheduling is session-persistent"
+    Scheduled tasks persist across sessions as long as agy is running. Check `/tasks` to view and manage scheduled tasks.
 
 ---
 
-## 4.4 — 会话恢复 <span class="duration-badge">5 min</span>
+## 4.4 — Session Resumption <span class="duration-badge">5 min</span>
 
-> **模式：长时间运行的工作** — 准确地从上次中断的地方继续。
-> 📖 完整参考：[使用 Antigravity CLI](https://www.antigravity.google/docs/cli-using)
+> **Pattern: Long-Running Work** — pick up exactly where you left off.
+> 📖 Full reference: [Using Antigravity CLI](https://www.antigravity.google/docs/cli-using)
 
-### 恢复最近的会话
+### Resume the Most Recent Session
 
-在 agy 内部，使用 `/resume` 斜杠命令：
+From inside agy, use the `/resume` slash command:
 
 ```bash
 /resume
 ```
 
-这将打开一个会话选择器，显示你最近的对话。选择一个进行恢复。
+This opens a session picker showing your recent conversations. Select one to resume.
 
-### 浏览和切换会话
+### Browse and Switch Sessions
 
 ```bash
 /switch
 ```
 
-与 `/resume` 相同 — 这两个命令都会打开会话选择器。
+Same as `/resume` — both commands open the session picker.
 
-### 退出时自动恢复
+### Auto-Resume on Exit
 
-当你退出 agy 会话时，agy 会打印出恢复该会话的确切命令：
+When you exit an agy session, agy prints the exact command to resume it:
 
 ```bash
 Session saved. Resume with: agy --conversation <conversation-id>
 ```
 
-你可以直接从终端使用此命令来重新进入。
+You can use this command directly from the terminal to jump back in.
 
-### 使用场景：多日功能开发工作
+### Use Case: Multi-Day Feature Work
 
 ```bash
 # Day 1: Start a feature
@@ -230,15 +324,15 @@ agy --conversation <conversation-id>
 > What was the last thing we decided about the payment API schema?
 ```
 
-agy 将拥有完整的上下文，包括已编写的代码、已做出的决策以及未解决的问题。
+agy will have the full context, including code written, decisions made, and open questions.
 
 ---
 
-## 4.5 — 高级：组合模式 <span class="duration-badge">可选</span>
+## 4.5 — Advanced: Combining Patterns <span class="duration-badge">Optional</span>
 
-> **完整能力栈：** 子代理 + /btw + 后台运行 + 调度 + 会话恢复。
+> **The full power stack:** subagents + /btw + background + scheduling + conversation resumption.
 
-### 企业级事件响应
+### Enterprise Incident Response
 
 ```text
 > I'm starting an incident response for a production issue. Spawn:
@@ -248,54 +342,56 @@ agy 将拥有完整的上下文，包括已编写的代码、已做出的决策�
 > Report back when both complete. I'll be monitoring in the meantime.
 ```
 
-在它们运行时：
+While they run:
 
 ```bash
 /btw The incident started at 14:32 UTC. Focus analysis on that window.
 ```
 
-这是多代理事件分类——两个并行的调查，且可在运行中途进行引导。
+This is multi-agent incident triage — two parallel investigations, steerable mid-flight.
 
 ---
 
-## 模块 4 练习
+## Module 4 Exercises
 
 <div class="exercise-card" markdown>
 
-### :material-file-document: 练习 4：子代理
+### :material-file-document: Exercise 4: Subagents
 
-**文件：** [`ex04_subagents.md`](exercises/ex04_subagents.md)
-**时长：** 20 分钟
-**目标：** 生成一个并行的审计团队。练习对抗性审查者模式。
+**File:** [`ex04_subagents.md`](exercises/ex04_subagents.md)
+**Duration:** 20 min
+**Objective:** Spawn a parallel audit team. Practice the adversarial reviewer pattern.
 
 </div>
 
 <div class="exercise-card" markdown>
 
-### :material-file-document: 练习 5：/btw 与调度
+### :material-file-document: Exercise 5: /btw & Scheduling
 
-**文件：** [`ex05_btw_scheduling.md`](exercises/ex05_btw_scheduling.md)
-**时长：** 20 分钟
-**目标：** 使用 /btw 引导长时间运行的任务。安排定期的代码质量报告。
+**File:** [`ex05_btw_scheduling.md`](exercises/ex05_btw_scheduling.md)
+**Duration:** 20 min
+**Objective:** Use /btw to steer a long-running task. Schedule a recurring code quality report.
 
 </div>
 
 <div class="exercise-card" markdown>
 
-### :material-file-document: 练习 6：沙盒治理
+### :material-file-document: Exercise 6: Sandbox Governance
 
-**文件：** [`ex06_sandbox_governance.md`](exercises/ex06_sandbox_governance.md)  
-**时长：** 15 分钟  
-**目标：** 在 settings.json 中配置沙盒模式，并使用权限模型进行测试。
+**File:** [`ex06_sandbox_governance.md`](exercises/ex06_sandbox_governance.md)  
+**Duration:** 15 min  
+**Objective:** Configure sandbox mode in settings.json and test with the permissions model.
 
 </div>
 
 ---
 
-## 您已完成
+## Next Steps
 
-→ **[速查表](cheatsheet.md)** — 所有四个模块的每个命令集中于一处
+→ **[Module 5: Building ADK Agents with agents-cli](agents-cli.md)** — build, evaluate, and deploy ADK agents on Google Cloud
 
-→ **[参考：DevOps 模式](devops-automation.md)** — `--print` 流水线、CI/CD、沙盒深度解析
+→ **[Cheatsheet](cheatsheet.md)** — every command and shortcut across the workshop
 
-→ **[参考：插件生态系统](plugin-ecosystem.md)** — 完整的插件生命周期参考
+→ **[Reference: DevOps Patterns](devops-automation.md)** — `--print` pipelines, CI/CD, sandbox deep dive
+
+→ **[Reference: Plugin Ecosystem](plugin-ecosystem.md)** — full plugin lifecycle reference
