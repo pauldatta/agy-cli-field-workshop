@@ -1,5 +1,10 @@
 # Antigravity CLI Field Workshop
 
+[![Antigravity CLI](https://img.shields.io/badge/Antigravity_CLI-v1.1.22-blue.svg)](https://antigravity.google)
+[![SDK](https://img.shields.io/badge/google--antigravity-v0.1.15-purple.svg)](https://antigravity.google)
+[![Updated](https://img.shields.io/badge/Updated-August_2026-success.svg)](#)
+[![Languages](https://img.shields.io/badge/Languages-EN%20%7C%20KO%20%7C%20ID%20%7C%20ZH-orange.svg)](#)
+
 > **Hands-on field workshop for Antigravity CLI.**
 
 📚 **Official Docs:** [antigravity.google/docs](https://www.antigravity.google/docs/cli-overview)

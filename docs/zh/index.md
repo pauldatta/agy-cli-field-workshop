@@ -9,6 +9,12 @@ hide:
   <img src="assets/banner.png" alt="Antigravity CLI 现场工作坊">
 </div>
 
+<div class="workshop-meta-bar" markdown>
+<span class="workshop-meta-item">:material-update: **最近更新：** 2026 年 8 月</span>
+<span class="workshop-meta-item">:material-check-decagram: **Antigravity 2.11 · CLI 1.1.22 · SDK 0.1.15**</span>
+<span class="workshop-meta-item">:material-translate: **English · 한국어 · Bahasa Indonesia · 简体中文**</span>
+</div>
+
 ---
 
 ## 研讨会模块

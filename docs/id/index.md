@@ -9,6 +9,12 @@ hide:
   <img src="assets/banner.png" alt="Lokakarya Lapangan Antigravity CLI">
 </div>
 
+<div class="workshop-meta-bar" markdown>
+<span class="workshop-meta-item">:material-update: **Pembaruan Terakhir:** Agustus 2026</span>
+<span class="workshop-meta-item">:material-check-decagram: **Antigravity 2.11 · CLI 1.1.22 · SDK 0.1.15**</span>
+<span class="workshop-meta-item">:material-translate: **English · 한국어 · Bahasa Indonesia · 简体中文**</span>
+</div>
+
 ---
 
 ## Modul Workshop
