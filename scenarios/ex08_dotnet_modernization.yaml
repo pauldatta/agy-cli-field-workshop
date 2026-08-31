@@ -1,0 +1,133 @@
+version: '1.0'
+metadata:
+  title: Antigravity CLI Field Workshop
+  subtitle: 'Exercise 8: .NET 5 to .NET 8 Cloud-Native Migration'
+  output: video/ex08_dotnet_modernization.mp4
+  poster_output: docs/assets/videos/ex08_poster.png
+  resolution:
+  - 1280
+  - 720
+  fps: 25
+  theme: catppuccin-mocha
+  statusbar_left: 'Antigravity CLI | Ex 8: .NET Modernization'
+  statusbar_right: TermReel HD
+environment:
+  auto_trust: true
+  setup_commands:
+  - rm -rf /tmp/contoso-university && mkdir -p /tmp/contoso-university
+  - if [ ! -d /tmp/cloud-solutions ]; then git clone --depth 1 https://github.com/GoogleCloudPlatform/cloud-solutions.git /tmp/cloud-solutions; fi
+  - cp -r /tmp/cloud-solutions/projects/dotnet-modernization-demo/dotnet-migration-sample/* /tmp/contoso-university/
+  - cd /tmp/contoso-university && git init && git add -A && git commit -m 'baseline .NET 5 ContosoUniversity'
+permissions:
+  auto_approve: true
+triggers:
+- on_match: Do you trust the contents of this project\?|Yes, I trust
+  action: Enter
+  once: true
+- on_match: \[y/N\]|Apply changes\?|Approve\?|Press Enter to continue
+  action:
+    type: send_key
+    value: y
+    delay_before: 0.5
+  once: false
+timeline:
+- show_card:
+    tag: Exercise 8
+    title: .NET 5 to .NET 8 Migration (PRD)
+    desc: 'Interactive session: Reconnaissance, AGENTS.md, minimal hosting, and EF Core 8'
+    duration: 2.5
+- show_card:
+    tag: Phase 0
+    title: Strict Mode & Reconnaissance
+    desc: Inspect ContosoUniversity dependencies without write side effects
+    duration: 2.0
+- launch:
+    command: bash
+    wait_for_prompt: true
+- type:
+    text: cd /tmp/contoso-university && ls -la ContosoUniversity/
+    speed: 0.035
+    send_key: Enter
+- pause: 2.0
+- type:
+    text: cat ContosoUniversity/ContosoUniversity.csproj | head -20
+    speed: 0.035
+    send_key: Enter
+- pause: 2.0
+- type:
+    text: agy
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 20.0
+    reading_pause: 2.0
+- type:
+    text: Analyze this ContosoUniversity application. Map current framework version, NuGet dependencies in ContosoUniversity.csproj, Startup.cs/Program.cs hosting pattern, and migration steps to .NET 8 with PostgreSQL on Cloud Run.
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- type:
+    text: 'Based on our analysis, generate a migration-aware AGENTS.md for ContosoUniversity. Include: current state, target .NET 8 / EF Core 8 / PostgreSQL architecture, migration rules, and Cloud Run requirements.'
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- show_card:
+    tag: Phase 1 & 2
+    title: TFM Upgrade & Minimal Hosting API
+    desc: Upgrade target framework to net8.0 and configure WebApplication.CreateBuilder()
+    duration: 2.0
+- type:
+    text: Upgrade ContosoUniversity/ContosoUniversity.csproj from net5.0 to net8.0. Replace EntityFramework 6 and Microsoft.EntityFrameworkCore.SqlServer with Npgsql.EntityFrameworkCore.PostgreSQL 8.0.
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- type:
+    text: 'Modernize hosting: replace Startup.cs and Program.cs with the .NET 8 minimal hosting WebApplication.CreateBuilder pattern in Program.cs and remove Startup.cs.'
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- show_card:
+    tag: Phase 3 & 4
+    title: EF Core 8 & Cloud Run Containerization
+    desc: Refactor SchoolContext to EF Core 8 and generate multi-stage Dockerfile
+    duration: 2.0
+- type:
+    text: Create a production multi-stage Linux Dockerfile for .NET 8 targeting Cloud Run listening on PORT 8080.
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- type:
+    text: /exit
+    speed: 0.035
+    send_key: Enter
+- pause: 2.0
+- show_card:
+    tag: Phase 5
+    title: Verification & Code Inspection
+    desc: Inspect git status and verified net8.0 modernization diff
+    duration: 2.0
+- type:
+    text: git status --short
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- type:
+    text: git diff ContosoUniversity/ContosoUniversity.csproj
+    speed: 0.035
+    send_key: Enter
+- pause: 3.0
+- show_card:
+    tag: Complete
+    title: Exercise 8 Verified
+    desc: .NET 8 cloud-native migration plan and recipes verified
+    duration: 2.5

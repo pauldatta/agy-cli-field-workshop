@@ -1,0 +1,121 @@
+version: '1.0'
+metadata:
+  title: Antigravity CLI Field Workshop
+  subtitle: 'Exercise 9: Java 8 to 21 & Spring Boot 3 Migration'
+  output: video/ex09_java_upgrade.mp4
+  poster_output: docs/assets/videos/ex09_poster.png
+  resolution:
+  - 1280
+  - 720
+  fps: 25
+  theme: catppuccin-mocha
+  statusbar_left: 'Antigravity CLI | Ex 9: Java 21 Migration'
+  statusbar_right: TermReel HD
+environment:
+  auto_trust: true
+  setup_commands:
+  - rm -rf /tmp/spring-petclinic-rest && mkdir -p /tmp/spring-petclinic-rest
+  - if [ ! -d /tmp/test-clones/spring-petclinic-rest ]; then git clone --branch v2.6.2 --depth 1 https://github.com/spring-petclinic/spring-petclinic-rest.git /tmp/test-clones/spring-petclinic-rest; fi
+  - cp -r /tmp/test-clones/spring-petclinic-rest/* /tmp/spring-petclinic-rest/
+  - cd /tmp/spring-petclinic-rest && git init && git add -A && git commit -m 'baseline Spring Boot 2.6.2 / Java 8 PetClinic'
+permissions:
+  auto_approve: true
+triggers:
+- on_match: Do you trust the contents of this project\?|Yes, I trust
+  action: Enter
+  once: true
+- on_match: \[y/N\]|Apply changes\?|Approve\?|Press Enter to continue
+  action:
+    type: send_key
+    value: y
+    delay_before: 0.5
+  once: false
+timeline:
+- show_card:
+    tag: Exercise 9
+    title: Java 8 to 21 & Spring Boot 3 (PRD)
+    desc: 'Interactive session: Context engineering, javax to jakarta namespace, and Spring Security 6'
+    duration: 2.5
+- show_card:
+    tag: Phase 0
+    title: Strict Mode & Reconnaissance
+    desc: Analyze PetClinic REST architecture and generate migration AGENTS.md
+    duration: 2.0
+- launch:
+    command: bash
+    wait_for_prompt: true
+- type:
+    text: cd /tmp/spring-petclinic-rest && ls -la
+    speed: 0.035
+    send_key: Enter
+- pause: 2.0
+- type:
+    text: cat pom.xml | head -35
+    speed: 0.035
+    send_key: Enter
+- pause: 2.0
+- type:
+    text: agy
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 20.0
+    reading_pause: 2.0
+- type:
+    text: Analyze the full project structure, dependencies, and architectural patterns of Spring PetClinic REST. Map all Spring Security configuration classes (WebSecurityConfigurerAdapter), data access layers (JDBC, JPA, Spring Data), and REST controller patterns.
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 75.0
+    reading_pause: 3.0
+- type:
+    text: 'Based on your analysis, generate a migration-aware AGENTS.md for this project. Include: 1. Current architecture (Boot 2.6, Java 8, javax namespace) 2. Target architecture (Boot 3.3, Java 21, jakarta namespace) 3. Migration rules (preserve javax.sql.*, migrate WebSecurityConfigurerAdapter to SecurityFilterChain) 4. Known risks.'
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 75.0
+    reading_pause: 3.0
+- type:
+    text: 'Upgrade pom.xml to Java 21 and Spring Boot 3.3.0. Perform the global namespace migration across all Java source files: replace javax.persistence, javax.validation, javax.servlet, and javax.annotation with their jakarta.* equivalents.'
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 75.0
+    reading_pause: 3.0
+- type:
+    text: 'Refactor security configuration: replace WebSecurityConfigurerAdapter with @Bean SecurityFilterChain using Spring Security 6 lambda DSL, replace SpringFox with SpringDoc OpenAPI, and enable spring.threads.virtual.enabled=true in application.properties.'
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 75.0
+    reading_pause: 3.0
+- type:
+    text: /exit
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- show_card:
+    tag: Phase 6
+    title: Verification & Code Inspection
+    desc: Inspect git status, pom.xml diff, and verified jakarta.* imports
+    duration: 2.0
+- type:
+    text: git status --short
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- type:
+    text: git diff pom.xml | head -30
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- type:
+    text: git grep -n "jakarta.persistence" src/main/java/ | head -10
+    speed: 0.035
+    send_key: Enter
+- pause: 3.0
+- show_card:
+    tag: Complete
+    title: Exercise 9 Verified
+    desc: Java 21, Spring Boot 3, and jakarta namespace migration verified
+    duration: 2.5

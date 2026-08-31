@@ -2,6 +2,14 @@
 
 > **Workshop Use:** Practice exercise for [Module 2 — Legacy Codebase Modernization](../legacy-modernization.md). Demonstrates agy strict mode, agent self-onboarding with AGENTS.md, subagent planning, and `ctrl+g` plan editing. The target repository includes a reference `modernization-prompt.md` authored by GCP Cloud Solutions Architects — a gold-standard example of prompt engineering for migration tasks.
 
+!!! example "Video Walkthrough: Ex08 Dotnet Modernization"
+    <video controls width="100%" poster="../assets/videos/ex08_poster.png">
+      <source src="../assets/videos/ex08_dotnet_modernization.mp4" type="video/mp4">
+      Download video: [ex08_dotnet_modernization.mp4](../assets/videos/ex08_dotnet_modernization.mp4)
+    </video>
+
+---
+
 ## Problem
 
 A partially-upgraded ASP.NET application (ContosoUniversity) runs on .NET 5 with Entity Framework 6 and the legacy Generic Host pattern (`Startup.cs` + `Program.cs`). .NET 5 reached end of support in May 2022. The app uses SQL Server-flavored EF6 but needs to target Cloud Run with PostgreSQL. It lacks containerization, structured logging, and graceful shutdown handling.

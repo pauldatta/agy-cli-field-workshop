@@ -1,0 +1,69 @@
+version: '1.0'
+metadata:
+  title: Antigravity CLI Field Workshop
+  subtitle: 'Module 2: Legacy Codebase Modernization'
+  output: video/module_02_legacy_modernization.mp4
+  poster_output: docs/assets/videos/module_02_poster.png
+  resolution:
+  - 1280
+  - 720
+  fps: 25
+  theme: catppuccin-mocha
+  statusbar_left: 'Antigravity CLI | Module 2: Legacy Modernization'
+  statusbar_right: TermReel HD
+environment:
+  auto_trust: true
+  setup_commands:
+  - rm -rf /tmp/legacy-modernization-demo && mkdir -p /tmp/legacy-modernization-demo
+  - if [ ! -d /tmp/cloud-solutions ]; then git clone --depth 1 https://github.com/GoogleCloudPlatform/cloud-solutions.git /tmp/cloud-solutions; fi
+  - cp -r /tmp/cloud-solutions/projects/dotnet-modernization-demo/dotnet-migration-sample/* /tmp/legacy-modernization-demo/
+  - cd /tmp/legacy-modernization-demo && git init && git add -A && git commit -m 'legacy .NET 5 baseline'
+permissions:
+  auto_approve: true
+triggers:
+- on_match: Do you trust the contents of this project\?|Yes, I trust
+  action: Enter
+  once: true
+timeline:
+- show_card:
+    tag: Module 2
+    title: Legacy Modernization Walkthrough
+    desc: Dependency analysis, framework upgrades, pattern migration, and regression verification
+    duration: 2.5
+- show_card:
+    tag: Section 2.1
+    title: Modernization Strategy & Framework Upgrades
+    desc: 5-phase modernization methodology for .NET 5 to .NET 8 and Java 8 to 21
+    duration: 2.0
+- launch:
+    command: bash
+- type:
+    text: cd /tmp/legacy-modernization-demo
+    speed: 0.035
+    send_key: Enter
+- pause: 1.5
+- type:
+    text: agy --dangerously-skip-permissions -p "Explain the 5-phase legacy modernization methodology in Antigravity CLI for migrating .NET 5 and Java 8 applications to .NET 8, Java 21, and Cloud Run." --print-timeout 45s
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- show_card:
+    tag: Section 2.2
+    title: Automated Refactoring & Regression Prevention
+    desc: Namespace migrations, minimal hosting, and characterization test safety gates
+    duration: 2.0
+- pause: 2.0
+- type:
+    text: agy --dangerously-skip-permissions -p "How do characterization tests, namespace migrations (javax to jakarta), and minimal hosting refactorings ensure zero-downtime modernization?" --print-timeout 45s
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- show_card:
+    tag: Complete
+    title: Module 2 Walkthrough Complete
+    desc: Legacy modernization methodology verified
+    duration: 2.5

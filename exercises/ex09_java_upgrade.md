@@ -2,6 +2,14 @@
 
 > **Workshop Use:** Practice exercise for [Module 2 — Legacy Codebase Modernization](../legacy-modernization.md). Demonstrates the large-context codebase investigation pattern, AGENTS.md self-onboarding, and how agy handles mechanical namespace migrations that are error-prone for humans.
 
+!!! example "Video Walkthrough: Ex09 Java Upgrade"
+    <video controls width="100%" poster="../assets/videos/ex09_poster.png">
+      <source src="../assets/videos/ex09_java_upgrade.mp4" type="video/mp4">
+      Download video: [ex09_java_upgrade.mp4](../assets/videos/ex09_java_upgrade.mp4)
+    </video>
+
+---
+
 ## Problem
 
 An enterprise Java REST API (Spring PetClinic REST) runs on Java 8 and Spring Boot 2.6.x. Java 8 reached end of public updates in 2022. The application can't use Virtual Threads, modern GC improvements, or the latest security patches. Compliance requires migration to a supported LTS version.

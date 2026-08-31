@@ -10,6 +10,14 @@
 
 ---
 
+!!! example "Video Walkthrough: Legacy Modernization"
+    <video controls width="100%" poster="assets/videos/module_02_poster.png">
+      <source src="assets/videos/module_02_legacy_modernization.mp4" type="video/mp4">
+      Download video: [module_02_legacy_modernization.mp4](assets/videos/module_02_legacy_modernization.mp4)
+    </video>
+
+---
+
 ## Why Legacy Modernization Is Hard
 
 The risk in large migrations isn't the code changes — it's the **unknowns**. You don't know what you'll break until it's broken. The three failure modes are:
