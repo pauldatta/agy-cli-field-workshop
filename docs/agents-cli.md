@@ -12,6 +12,14 @@
 
 ---
 
+!!! example "Video Walkthrough: Agents Cli"
+    <video controls width="100%" poster="assets/videos/module_05_poster.png">
+      <source src="assets/videos/module_05_agents_cli.mp4" type="video/mp4">
+      Download video: [module_05_agents_cli.mp4](assets/videos/module_05_agents_cli.mp4)
+    </video>
+
+---
+
 ## What is agents-cli?
 
 `agents-cli` is **not** a coding agent. It's a **toolkit for coding agents** — it gives your Antigravity CLI session the skills and commands to build, evaluate, and deploy [ADK](https://adk.dev) (Agent Development Kit) agents on Google Cloud.

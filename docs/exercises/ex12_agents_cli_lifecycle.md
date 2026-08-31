@@ -2,6 +2,14 @@
 
 > **Duration:** 45 min | **Module:** 5 — Building ADK Agents with agents-cli
 
+!!! example "Video Walkthrough: Ex12 Agents Cli Lifecycle"
+    <video controls width="100%" poster="../assets/videos/ex12_poster.png">
+      <source src="../assets/videos/ex12_agents_cli_lifecycle.mp4" type="video/mp4">
+      Download video: [ex12_agents_cli_lifecycle.mp4](../assets/videos/ex12_agents_cli_lifecycle.mp4)
+    </video>
+
+---
+
 ---
 
 ## Objective

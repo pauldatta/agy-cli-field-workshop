@@ -1,0 +1,134 @@
+version: '1.0'
+metadata:
+  title: Antigravity CLI Field Workshop
+  subtitle: 'Exercise 12: ADK Agent Lifecycle with agents-cli'
+  output: video/ex12_agents_cli_lifecycle.mp4
+  poster_output: docs/assets/videos/ex12_poster.png
+  resolution:
+  - 1280
+  - 720
+  fps: 25
+  theme: catppuccin-mocha
+  statusbar_left: 'Antigravity CLI | Ex 12: agents-cli Lifecycle'
+  statusbar_right: TermReel HD
+environment:
+  auto_trust: true
+  setup_commands:
+  - rm -rf /tmp/meeting-notes-workspace && mkdir -p /tmp/meeting-notes-workspace
+permissions:
+  auto_approve: true
+triggers:
+- on_match: Do you trust the contents of this project\?|Yes, I trust
+  action: Enter
+  once: true
+- on_match: \[y/N\]|Apply changes\?|Approve\?|Press Enter to continue
+  action:
+    type: send_key
+    value: y
+    delay_before: 0.5
+  once: false
+timeline:
+- show_card:
+    tag: Exercise 12
+    title: ADK Agent Lifecycle with agents-cli (45 min)
+    desc: Scaffolding, interactive agy tool authoring, and eval suite configuration
+    duration: 2.5
+- show_card:
+    tag: Part 1
+    title: Scaffold ADK Agent with agents-cli
+    desc: Create prototype meeting-notes agent with GEMINI.md guidance
+    duration: 2.0
+- launch:
+    command: bash
+    wait_for_prompt: true
+- type:
+    text: cd /tmp/meeting-notes-workspace && agents-cli scaffold create meeting-notes --agent adk --prototype --agent-guidance-filename GEMINI.md
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- type:
+    text: cd meeting-notes && ls -la
+    speed: 0.035
+    send_key: Enter
+- pause: 2.0
+- type:
+    text: cat pyproject.toml | head -25
+    speed: 0.035
+    send_key: Enter
+- pause: 2.0
+- show_card:
+    tag: Part 2
+    title: 'Interactive agy Session: Tools & Agent'
+    desc: Prompt agy to implement format_summary tool and configure root_agent
+    duration: 2.0
+- type:
+    text: agy
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 20.0
+    reading_pause: 2.0
+- type:
+    text: Implement the format_summary tool in app/tools.py that structures meeting title, attendees, action items (with assignee and deadline), and key decisions into markdown. Then configure root_agent in app/agent.py using gemini-3.5-flash with tools=[format_summary].
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- type:
+    text: In tests/eval/datasets/basic-dataset.json, create 3 evaluation cases with meeting transcripts (sprint planning, architecture review). In tests/eval/eval_config.yaml, configure the custom meeting_summary_quality metric.
+    speed: 0.035
+    send_key: Enter
+- wait_for_idle:
+    timeout: 60.0
+    reading_pause: 3.0
+- type:
+    text: /exit
+    speed: 0.035
+    send_key: Enter
+- pause: 2.0
+- show_card:
+    tag: Part 3
+    title: Inspect Code & Eval Configuration
+    desc: Review agent implementation, eval dataset, and custom metrics
+    duration: 2.0
+- type:
+    text: cat app/tools.py | head -30
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- type:
+    text: cat app/agent.py | head -30
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- type:
+    text: cat tests/eval/datasets/basic-dataset.json | head -30
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- type:
+    text: cat tests/eval/eval_config.yaml
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- show_card:
+    tag: Part 4
+    title: CLI Inspection & Project State
+    desc: Verify agents-cli info and project repository structure
+    duration: 2.0
+- type:
+    text: agents-cli info
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- type:
+    text: git status --short
+    speed: 0.035
+    send_key: Enter
+- pause: 2.5
+- show_card:
+    tag: Complete
+    title: Exercise 12 Verified
+    desc: ADK Agent scaffolded, configured, and evaluation suite established
+    duration: 2.5
