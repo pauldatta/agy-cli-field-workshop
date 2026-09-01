@@ -2,7 +2,7 @@ version: '1.0'
 metadata:
   title: Antigravity CLI Field Workshop
   subtitle: 'Exercise 12: ADK Agent Lifecycle with agents-cli'
-  output: video/ex12_agents_cli_lifecycle.mp4
+  output: docs/assets/videos/ex12_agents_cli_lifecycle.mp4
   poster_output: docs/assets/videos/ex12_poster.png
   resolution:
   - 1280
@@ -11,14 +11,16 @@ metadata:
   theme: catppuccin-mocha
   statusbar_left: 'Antigravity CLI | Ex 12: agents-cli Lifecycle'
   statusbar_right: TermReel HD
+
 environment:
   auto_trust: true
   setup_commands:
-    - rm -rf /tmp/meeting-notes-workspace /tmp/eval_baseline.json /tmp/eval_results.json && mkdir -p /tmp/meeting-notes-workspace
-    - echo '{"summary":{"total_cases":2,"passed":2,"metrics":{"multi_turn_task_success":1.0,"meeting_summary_quality":4.8}}}' > /tmp/eval_baseline.json
-    - echo '{"summary":{"total_cases":2,"passed":2,"metrics":{"multi_turn_task_success":1.0,"meeting_summary_quality":5.0}}}' > /tmp/eval_results.json
+    - python3 /tmp/stage_ex12.py
+    - rm -rf /tmp/meeting-notes-workspace && mkdir -p /tmp/meeting-notes-workspace
+
 permissions:
   auto_approve: true
+
 triggers:
 - on_match: Do you trust the contents of this project\?|Yes, I trust
   action: Enter
@@ -29,88 +31,153 @@ triggers:
     value: y
     delay_before: 0.5
   once: false
+
 timeline:
 - show_card:
     tag: Exercise 12
     title: ADK Agent Lifecycle with agents-cli (45 min)
-    desc: Scaffolding, interactive agy tool authoring, and eval suite execution
+    desc: Scaffold, build tools, write eval suite, and execute eval-fix comparison
     duration: 2.5
+
+# Part 1: Scaffold
 - show_card:
     tag: Part 1
-    title: Scaffold ADK Agent with agents-cli
+    title: Scaffold the Agent (10 min)
     desc: Create prototype meeting-notes agent with GEMINI.md guidance
     duration: 2.0
+
 - launch:
     command: bash
     wait_for_prompt: true
+
 - type:
     text: cd /tmp/meeting-notes-workspace && agents-cli scaffold create meeting-notes --agent adk --prototype --agent-guidance-filename GEMINI.md
     speed: 0.035
     send_key: Enter
+
 - pause: 2.5
+
 - type:
     text: cd meeting-notes && ls -la
     speed: 0.035
     send_key: Enter
+
 - pause: 2.0
+
+- type:
+    text: cp -r /tmp/staged_meeting_notes/* .
+    speed: 0.035
+    send_key: Enter
+
+- pause: 1.5
+
+# Part 2: Build the Agent
 - show_card:
     tag: Part 2
-    title: 'Interactive agy Session: Tools & Agent'
-    desc: Prompt agy to implement format_summary tool and configure root_agent
+    title: Build the Agent (15 min)
+    desc: Inspect format_summary tool, root_agent, and run live smoke test
     duration: 2.0
+
 - type:
-    text: agy
+    text: head -n 25 app/tools.py
     speed: 0.035
     send_key: Enter
-- wait_for_idle:
-    timeout: 20.0
-    reading_pause: 2.0
+
+- pause: 2.5
+
 - type:
-    text: Implement the format_summary tool in app/tools.py that structures meeting title, attendees, action items (with assignee and deadline), and key decisions into markdown. Then configure root_agent in app/agent.py using gemini-3.5-flash with tools=[format_summary].
+    text: head -n 25 app/agent.py
     speed: 0.035
     send_key: Enter
-- wait_for_idle:
-    timeout: 60.0
-    reading_pause: 3.0
+
+- pause: 2.5
+
 - type:
-    text: In tests/eval/datasets/basic-dataset.json, create 3 evaluation cases with meeting transcripts (sprint planning, architecture review). In tests/eval/eval_config.yaml, configure the custom meeting_summary_quality metric.
+    text: 'agents-cli run "Summarize this meeting: Alice and Bob discussed the Q3 launch. Alice will prepare the marketing deck by Friday. Bob will review the API docs by next Monday. They decided to use Cloud Run for deployment."'
     speed: 0.035
     send_key: Enter
-- wait_for_idle:
-    timeout: 60.0
-    reading_pause: 3.0
-- type:
-    text: /exit
-    speed: 0.035
-    send_key: Enter
-- pause: 2.0
+
+- pause: 4.5
+
+# Part 3: Write Eval Cases
 - show_card:
     tag: Part 3
-    title: Evaluation Benchmark & Score Comparison
-    desc: Execute eval suite and compare candidate results against baseline
+    title: Write Eval Cases & Metrics (10 min)
+    desc: Author basic-dataset.json transcripts and custom meeting_summary_quality metric
     duration: 2.0
+
 - type:
-    text: agents-cli eval compare /tmp/eval_baseline.json /tmp/eval_results.json
+    text: cat tests/eval/eval_config.yaml
     speed: 0.035
     send_key: Enter
-- pause: 3.5
+
+- pause: 2.5
+
+- type:
+    text: head -n 25 tests/eval/datasets/basic-dataset.json
+    speed: 0.035
+    send_key: Enter
+
+- pause: 2.5
+
+- type:
+    text: agents-cli eval generate --help
+    speed: 0.035
+    send_key: Enter
+
+- pause: 2.0
+
+- type:
+    text: agents-cli eval grade --help
+    speed: 0.035
+    send_key: Enter
+
+- pause: 2.0
+
+# Part 4: Eval-Fix Loop & Benchmark Comparison
 - show_card:
     tag: Part 4
-    title: CLI Inspection & Project State
-    desc: Verify agents-cli info and project repository structure
+    title: The Eval-Fix Loop & Comparison (10 min)
+    desc: Inspect grade results and compare candidate metrics against baseline
     duration: 2.0
+
+- type:
+    text: cat artifacts/grade_results/baseline.json
+    speed: 0.035
+    send_key: Enter
+
+- pause: 2.0
+
+- type:
+    text: cat artifacts/grade_results/results_fixed.json
+    speed: 0.035
+    send_key: Enter
+
+- pause: 2.0
+
+- type:
+    text: agents-cli eval compare artifacts/grade_results/baseline.json artifacts/grade_results/results_fixed.json
+    speed: 0.035
+    send_key: Enter
+
+- pause: 3.5
+
+# Part 5: Project Info & Summary
+- show_card:
+    tag: Part 5
+    title: Project Info & Completion Verification
+    desc: Verify unified agents-cli project state and metadata
+    duration: 2.0
+
 - type:
     text: agents-cli info
     speed: 0.035
     send_key: Enter
+
 - pause: 2.5
-- type:
-    text: git status --short
-    speed: 0.035
-    send_key: Enter
-- pause: 2.5
+
 - show_card:
     tag: Complete
     title: Exercise 12 Verified
-    desc: ADK Agent scaffolded, configured, and evaluation suite established
+    desc: ADK Agent scaffolded, built, evaluated, and verified across all lifecycle milestones
     duration: 2.5
